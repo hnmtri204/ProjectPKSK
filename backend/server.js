@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 
 const userRouterRole = require("./routers/Role");
 const userRouterDoctor = require("./routers/Doctor");
+const userRouterPatient = require("./routers/Patient");
 const userRouterSpecialization = require("./routers/Specialization");
 
 
@@ -24,6 +25,7 @@ app.use(express.json());
 //user route
 app.use("/role", userRouterRole);
 app.use("/doctor", userRouterDoctor);
+app.use("/patient", userRouterPatient);
 app.use("/specialization", userRouterSpecialization);
 
 
