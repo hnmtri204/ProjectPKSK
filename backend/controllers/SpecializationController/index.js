@@ -1,8 +1,15 @@
 const Specialization = require("../../models/Specialization");
 const Doctor = require("../../models/Doctor");
+const validateSpecialization = require("../../requests/validateSpecialization");
 
 const createSpecialization = async (req, res) => {
   try {
+    // Validate dữ liệu từ client
+    const { error } = validateSpecialization(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
     const specialization = await Specialization.create(req.body);
     if (specialization) {
       return res.status(200).json(specialization);
@@ -39,6 +46,25 @@ const findSpecialization = async (req, res) => {
 };
 
 
+const updateSpecialization = async (req, res) => {
+  try {
+    // Validate dữ liệu từ client
+    const { error } = validateSpecialization(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
+    const {id} = req.params;
+    const specialization = await Specialization.findByIdAndUpdate(id, req.body);
+    if (!specialization) {
+      return res.status(404).json({ message: "Specialization not found" });
+    }
+    return res.status(200).json(specialization);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
+
 const deleteSpecialization = async (req, res) => {
   try {
     const { id } = req.params;
@@ -54,4 +80,4 @@ const deleteSpecialization = async (req, res) => {
   }
 };
 
-module.exports = { createSpecialization, findAllSpecialization, findSpecialization, deleteSpecialization };
+module.exports = { createSpecialization, findAllSpecialization, findSpecialization, updateSpecialization, deleteSpecialization };

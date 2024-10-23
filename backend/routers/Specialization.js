@@ -4,6 +4,7 @@ const {
   createSpecialization,
   findAllSpecialization,
   findSpecialization,
+  updateSpecialization,
   deleteSpecialization
 } = require("../controllers/SpecializationController/index");
 
@@ -11,6 +12,7 @@ const {
 router.post("/create", createSpecialization);
 router.get("/find-all", findAllSpecialization);
 router.get("/find/:id", findSpecialization);
+router.put("/update/:id", updateSpecialization);
 router.delete("/delete/:id", deleteSpecialization);
 
 module.exports = router;
