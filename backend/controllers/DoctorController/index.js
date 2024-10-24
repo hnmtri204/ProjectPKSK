@@ -2,7 +2,7 @@ const Role = require("../../models/Role");
 const User = require("../../models/User");
 const UserRole = require("../../models/User_role");
 const Doctor = require("../../models/Doctor");
-const validateDoctor = require('../../requests/validateDoctor');
+const validateDoctor = require("../../requests/validateDoctor");
 
 //{ key: value } là một đtuong trong js, thường dùng để crud
 /*
@@ -15,11 +15,11 @@ từ đối tượng hoặc mảng và gán chúng vào các biến riêng biệ
  */
 const createDoctor = async (req, res) => {
   try {
-     // Validate dữ liệu từ client
-     const { error } = validateDoctor(req.body);
-     if (error) {
-       return res.status(400).json({ message: error.details[0].message });
-     }
+    // Validate dữ liệu từ client
+    const { error } = validateDoctor(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
 
     // Tạo người dùng mới
     const doctor = await User.create(req.body);
@@ -41,6 +41,7 @@ const createDoctor = async (req, res) => {
       await Doctor.create({
         user_id: doctor._id,
         specialization_id: specializationId,
+        description: req.body.description,
       });
 
       // Trả về thông tin người dùng
@@ -88,14 +89,14 @@ const updateDoctor = async (req, res) => {
     const { id } = req.params;
     const doctor = await Doctor.findById(id);
     if (!doctor) {
-      res.status(404).json({ message: "Doctor not found" });
+      return res.status(404).json({ message: "Doctor not found" });
     }
 
-     // Validate dữ liệu từ client
-     const { error } = validateDoctor(req.body);
-     if (error) {
-       return res.status(400).json({ message: error.details[0].message });
-     }
+    // Validate dữ liệu từ client
+    const { error } = validateDoctor(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
 
     const doctorUpdate = await Doctor.findByIdAndUpdate(id, req.body);
     await User.findByIdAndUpdate(
@@ -105,12 +106,12 @@ const updateDoctor = async (req, res) => {
         email: req.body.email,
         password: req.body.password,
         image: req.body.image,
-        phone: req.body.phone,  
+        phone: req.body.phone,
       }
     );
-    res.status(200).json(doctorUpdate);
+    return res.status(200).json(doctorUpdate);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 

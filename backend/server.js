@@ -4,7 +4,11 @@ const mongoose = require("mongoose");
 
 const userRouterRole = require("./routers/Role");
 const userRouterDoctor = require("./routers/Doctor");
+const userRouterPatient = require("./routers/Patient");
 const userRouterSpecialization = require("./routers/Specialization");
+const userRouterNotification = require("./routers/Notification");
+const userRouterAppointment = require("./routers/Appointment");
+const userRouterSchedule = require("./routers/Schedule");
 
 const cors = require('cors');
 
@@ -27,7 +31,11 @@ app.use(express.json());
 //user route
 app.use("/role", userRouterRole);
 app.use("/doctor", userRouterDoctor);
+app.use("/patient", userRouterPatient);
 app.use("/specialization", userRouterSpecialization);
+app.use("/notification", userRouterNotification);
+app.use("/appointment", userRouterAppointment);
+app.use("/schedule", userRouterSchedule);
 
 
 //route defauld

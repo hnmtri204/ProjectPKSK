@@ -5,6 +5,7 @@ const Appointment_historySchema = new mongoose.Schema({
     type: String,
     enum: ["pending", "confirmed", "cancelled"],
     required: true,
+    default: "confirmed"
   },
   date: {
     type: Date,
