@@ -6,8 +6,11 @@ const userRouterRole = require("./routers/Role");
 const userRouterDoctor = require("./routers/Doctor");
 const userRouterSpecialization = require("./routers/Specialization");
 
+const cors = require('cors');
 
 const app = express();
+
+app.use(cors());
 
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
@@ -36,3 +39,5 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+
