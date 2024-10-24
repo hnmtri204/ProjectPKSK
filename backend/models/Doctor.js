@@ -12,6 +12,10 @@ const DoctorSchema = new mongoose.Schema(
         ref: "Specialization",
         required: false
       },
+      description: {
+        type: String,
+        required: true,
+      },
   },
   {
     timestamps: true,

@@ -41,6 +41,7 @@ const createDoctor = async (req, res) => {
       await Doctor.create({
         user_id: doctor._id,
         specialization_id: specializationId,
+        description: req.body.description,
       });
 
       // Trả về thông tin người dùng
