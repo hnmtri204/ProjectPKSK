@@ -44,10 +44,8 @@ const createPatient = async (req, res) => {
       await UserRole.create({ user_id: patient._id, role_id: role._id });
 
       // Tạo bản ghi trong bảng patient
-      const medical_history = req.body.medical_history;
       await Patient.create({
         user_id: patient._id,
-        medical_history: medical_history,
       });
 
       // Trả về thông tin người dùng
