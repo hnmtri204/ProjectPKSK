@@ -5,7 +5,6 @@ const patientSchema = Joi.object({
   email: Joi.string().email().required(),
   phone: Joi.string().length(10).required(),
   password: Joi.string().min(6).required(),
-  medical_history: Joi.string(),
 });
 
 const validatePatient = (data) => {
