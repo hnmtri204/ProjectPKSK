@@ -11,7 +11,7 @@ const Login = () => {
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
-    // Thêm logic xử lý đăng nhập hoặc đăng ký ở đây
+    // Thêm logic xử lý đăng nhập hoặc đăng ký ở đâya
   }
 
   return (
@@ -19,7 +19,7 @@ const Login = () => {
       <div className='flex flex-col gap-3 m-auto items-start p-8 min-w-[340px] sm:min-w-96 border rounded-xl text-zinc-600 text-sm shadow-lg'>
         <p className='text-2xl font-semibold'>{state === 'Sign Up' ? "Tạo tài khoản" : "Đăng nhập"}</p>
         <p>Vui lòng {state === 'Sign Up' ? "đăng ký" : "đăng nhập"} để đặt lịch hẹn</p>
-        
+
         {
           state === "Sign Up" && <div className='w-full'>
             <p>Tên đầy đủ</p>

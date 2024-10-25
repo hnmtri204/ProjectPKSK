@@ -1,112 +1,116 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useContext, useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
-import { AppContext } from '../context/AppContext'
-import { assets } from '../assets/assets'
-import RelatedDoctors from '../components/RelatedDoctors'
+import React, { useContext, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { AppContext } from '../context/AppContext';
+import { assets } from '../assets/assets';
+import RelatedDoctors from '../components/RelatedDoctors';
+import axios from 'axios';
 
 const Appointment = () => {
+  const { docId } = useParams();
+  const { doctors, setDoctors } = useContext(AppContext);
+  const daysOfWeek = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ nhật'];
 
-  const { docId } = useParams()
-  const { doctors, currencySymbol } = useContext(AppContext)
-  const daysOfWeek = ['Thứ 6', 'Thứ 7', 'Chủ nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5']
-
-  const [docInfo, setDocInfo] = useState(null)
-  const [docSlots, setDocSlots] = useState([])
-  const [slotIndex, setSlotIndex] = useState(0)
-  const [slotTime, setSlotTime] = useState('')
+  const [docInfo, setDocInfo] = useState(null);
+  const [docSlots, setDocSlots] = useState([]);
+  const [slotIndex, setSlotIndex] = useState(0);
+  const [slotTime, setSlotTime] = useState('');
 
   const fetchDocInfo = async () => {
-    const docInfo = doctors.find(doc => doc._id === docId)
-    setDocInfo(docInfo)
-  }
+    const docInfo = doctors.find(doc => doc._id === docId);
+    setDocInfo(docInfo);
+  };
 
-  const getAvailableSlots = async () => {
+  const getAvailableSlots = () => {
     setDocSlots([]);
 
-    // Getting current date
     let today = new Date();
+    let dayOfWeek = today.getDay(); 
+
+    if (dayOfWeek === 0) dayOfWeek = 6; 
+    else dayOfWeek -= 1; 
 
     for (let i = 0; i < 7; i++) {
-      // Getting date with index
       let currentDate = new Date(today);
-      currentDate.setDate(today.getDate() + i);
+      currentDate.setDate(today.getDate() + (i + 1 - dayOfWeek)); 
 
       let morningEndTime = new Date(currentDate);
-      morningEndTime.setHours(12, 0, 0, 0); // End of the morning session at 12 PM
+      morningEndTime.setHours(12, 0, 0, 0); 
 
       let afternoonStartTime = new Date(currentDate);
-      afternoonStartTime.setHours(13, 0, 0, 0); // Start of the afternoon session at 1 PM
+      afternoonStartTime.setHours(13, 0, 0, 0); 
 
       let afternoonEndTime = new Date(currentDate);
-      afternoonEndTime.setHours(17, 0, 0, 0); // End of the afternoon session at 5 PM
+      afternoonEndTime.setHours(17, 0, 0, 0); 
 
-      // Function to generate slots within a given time period
       const generateTimeSlots = (startTime, endTime) => {
         let timeSlots = [];
         while (startTime < endTime) {
           let formattedTime = startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-          // Add slot to array
           timeSlots.push({
             datetime: new Date(startTime),
             time: formattedTime,
           });
 
-          // Increment current time by 30 minutes
           startTime.setMinutes(startTime.getMinutes() + 30);
         }
         return timeSlots;
       };
 
-      // Generate morning and afternoon slots
       let morningSlots = generateTimeSlots(new Date(currentDate.setHours(8, 0, 0, 0)), morningEndTime);
       let afternoonSlots = generateTimeSlots(new Date(afternoonStartTime), afternoonEndTime);
 
-      // Merge morning and afternoon slots for the current date
       setDocSlots((prev) => [...prev, [...morningSlots, ...afternoonSlots]]);
     }
   };
 
-  useEffect(() => {
-    fetchDocInfo()
-  }, [doctors, docId])
+  const fetchDoctors = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/doctor/find-all');
+      setDoctors(response.data);
+    } catch (error) {
+      console.error('Error fetching doctors:', error);
+    }
+  };
 
   useEffect(() => {
-    getAvailableSlots()
-  }, [docInfo])
+    fetchDoctors(); // Fetch doctors when component mounts
+  }, []);
 
   useEffect(() => {
-    console.log(docSlots)
-  }, [docSlots])
+    fetchDocInfo();
+  }, [doctors, docId]);
+
+  useEffect(() => {
+    if (docInfo) {
+      getAvailableSlots();
+    }
+  }, [docInfo]);
 
   return docInfo && (
     <div>
       {/* ----- Doctor Details ----- */}
       <div className='flex flex-col sm:flex-row gap-4'>
         <div>
-          <img className='bg-primary w-full sm:max-w-72 rounded-lg' src={docInfo.image} alt="" />
+          <img className='bg-primary w-full sm:max-w-72 rounded-lg' src={docInfo.user_id.image} alt="" />
         </div>
 
         <div className='flex-1 border border-gray-400 rounded-lg p-8 py-7 bg-white mx-2 sm:mx-0 mt-[-80px] sm:mt-0'>
           {/* ----- Doc Info : name, degree, experience ----- */}
           <p className='flex items-center gap-2 text-2xl font-medium text-gray-900'>
-            {docInfo.name}
+            {docInfo.user_id.name}
             <img className='w-5' src={assets.verified_icon} alt="" />
           </p>
           <div className='flex items-center gap-2 text-sm mt-1 text-gray-600'>
-            <p>{docInfo.degree} - {docInfo.speciality}</p>
-            <button className='py-0.5 px-2 border text-xs rounded-full'>{docInfo.experience}</button>
+            <p>Khoa : {docInfo.specialization_id.name}</p>
           </div>
 
           {/* ----- Doctor About ----- */}
           <div>
             <p className='flex items-center gap-1 text-sm font-medium text-gray-900'>Giới thiệu <img src={assets.info_icon} alt="" /></p>
-            <p className='text-sm text-gray-500 max-w-[700px] mt-1'>{docInfo.about}</p>
+            <p className='text-sm text-gray-500 max-w-[700px] mt-1'>{docInfo.description}</p>
           </div>
-          <p className='text-gray-500 font-medium mt-4'>
-            Phí hẹn: <span className='text-gray-600'>{currencySymbol}{docInfo.fees}</span>
-          </p>
         </div>
       </div>
 
@@ -117,8 +121,8 @@ const Appointment = () => {
           {
             docSlots.length && docSlots.map((item, index) => (
               <div onClick={() => setSlotIndex(index)} className={`text-center py-6 min-w-16 rounded-full cursor-pointer ${slotIndex === index ? 'bg-[#00759c] text-white' : 'border border-gray-200'}`} key={index}>
-                <p>{item[0] && daysOfWeek[item[0].datetime.getDay()]}</p>
-                <p>{item[0] && item[0].datetime.getDate()}</p>
+                <p>{item[0] && daysOfWeek[index]}</p>
+                <p>{item[0] && `${item[0].datetime.getDate()}/${item[0].datetime.getMonth() + 1}`}</p>
               </div>
             ))
           }
@@ -138,9 +142,10 @@ const Appointment = () => {
       </div>
 
       {/* ----- Listing Related Doctors ----- */}
-      <RelatedDoctors docId={docId} speciality={docInfo.speciality} />
+      <RelatedDoctors docId={docId} speciality={docInfo.specialization_id.name} />
     </div>
-  )
+  );
 }
 
-export default Appointment
+export default Appointment;
+
