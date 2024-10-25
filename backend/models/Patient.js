@@ -6,11 +6,7 @@ const PatientSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-    },
-    medical_history: {
-      type: String,
-      required: false,
-    },
+    }
   },
   {
     timestamps: true,
