@@ -27,22 +27,38 @@ const login = async (req, res) => {
     const roleUsers = await RoleUser.find({ user_id: user._id }).populate('role_id');
     console.log(roleUsers);
 
-
     // Lấy role đầu tiên (nếu có)
     const userRole = roleUsers.length > 0 ? roleUsers[0].role_id.name : null;
 
+    // Lưu thông tin người dùng vào session
+    req.session.user = {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: userRole,
+    };
+
     return res.status(200).json({
       message: "Login successful!",
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: userRole,
-      },
+      user: req.session.user, // Gửi thông tin người dùng đã lưu trong session
     });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };
 
-module.exports = { login };
+const logout = async (req, res) => {
+  try {
+    // Xóa thông tin người dùng trong session
+    req.session.destroy(err => {
+      if (err) {
+        return res.status(500).json({ message: "Could not log out." });
+      }
+      return res.status(200).json({ message: "Logout successful!" });
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { login, logout };
