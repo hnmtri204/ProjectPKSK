@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const Role = require("../../models/Role");
 const User = require("../../models/User");
 const UserRole = require("../../models/User_role");
@@ -13,6 +14,8 @@ từ đối tượng hoặc mảng và gán chúng vào các biến riêng biệ
   populate dung de lấy dữ liệu từ các bảng (collections) khác trong MongoDB dựa trên các trường 
  tham chiếu (reference fields)
  */
+//...req.body: Đây là cú pháp spread operator
+
 const createDoctor = async (req, res) => {
   try {
     // Validate dữ liệu từ client
@@ -21,8 +24,13 @@ const createDoctor = async (req, res) => {
       return res.status(400).json({ message: error.details[0].message });
     }
 
-    // Tạo người dùng mới
-    const doctor = await User.create(req.body);
+    // Băm mật khẩu
+    const hashedPassword = await bcrypt.hash(req.body.password, 10); // 10 là số vòng băm
+
+    const doctor = await User.create({
+      ...req.body,
+      password: hashedPassword,
+    });
 
     // Kiểm tra xem người dùng có được tạo thành công không
     if (doctor) {
@@ -99,12 +107,13 @@ const updateDoctor = async (req, res) => {
     }
 
     const doctorUpdate = await Doctor.findByIdAndUpdate(id, req.body);
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
     await User.findByIdAndUpdate(
       { _id: doctor.user_id },
       {
         name: req.body.name,
         email: req.body.email,
-        password: req.body.password,
+        password: hashedPassword,
         image: req.body.image,
         phone: req.body.phone,
       }

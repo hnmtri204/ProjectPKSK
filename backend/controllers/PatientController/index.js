@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const Role = require("../../models/Role");
 const User = require("../../models/User");
 const UserRole = require("../../models/User_role");
@@ -22,8 +23,13 @@ const createPatient = async (req, res) => {
        return res.status(400).json({ message: error.details[0].message });
      }
 
-    // Tạo người dùng mới
-    const patient = await User.create(req.body);
+     // Băm mật khẩu
+     const hashedPassword = await bcrypt.hash(req.body.password, 10); // 10 là số vòng băm
+
+     const patient = await User.create({
+       ...req.body,
+       password: hashedPassword,
+     });
 
     // Kiểm tra xem người dùng có được tạo thành công không
     if (patient) {
@@ -97,12 +103,13 @@ const updatePatient = async (req, res) => {
      }
 
     const patientUpdate = await Patient.findByIdAndUpdate(id, req.body);
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
     await User.findByIdAndUpdate(
       { _id: patient.user_id },
       {
         name: req.body.name,
         email: req.body.email,
-        password: req.body.password,
+        password: hashedPassword,
         phone: req.body.phone,  
       }
     );

@@ -9,6 +9,7 @@ const userRouterSpecialization = require("./routers/Specialization");
 const userRouterNotification = require("./routers/Notification");
 const userRouterAppointment = require("./routers/Appointment");
 const userRouterSchedule = require("./routers/Schedule");
+const userRouterHome = require("./routers/Home");
 
 
 const app = express();
@@ -33,6 +34,7 @@ app.use("/specialization", userRouterSpecialization);
 app.use("/notification", userRouterNotification);
 app.use("/appointment", userRouterAppointment);
 app.use("/schedule", userRouterSchedule);
+app.use("/", userRouterHome);
 
 
 //route defauld
