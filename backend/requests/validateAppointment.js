@@ -4,6 +4,7 @@ const appointmentSchema = Joi.object({
   patient_id: Joi.required(),
   doctor_id: Joi.required(),
   work_shift: Joi.required(),
+  work_date: Joi.required(),
   status: Joi.string(),
 });
 
