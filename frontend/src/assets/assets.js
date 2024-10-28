@@ -1,7 +1,6 @@
-import appointment_img from './appointment_img.png'
 import header_img from './header_img.png'
 import group_profiles from './group_profiles.png'
-import profile_pic from './profile_pic.png'
+import profile_pic from './upload_area.png'
 import contact_image from './kham-suc-khoe-tong-quat.png'
 import about_image from './form-booking.png'
 import logo from './TripleTCare.png'
@@ -38,7 +37,6 @@ import Pediatricians from './Pediatricians.svg'
 
 
 export const assets = {
-    appointment_img,
     header_img,
     group_profiles,
     logo,

@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import React from 'react'
 import { assets } from '../assets/assets'
-import HomepageBanner from '../assets/Homepage-Banner.jpg'; // Đảm bảo đường dẫn đúng
+import HomepageBanner from '../assets/Homepage-Banner.jpg';
 
 const Header1 = () => {
     return (
@@ -18,7 +18,7 @@ const Header1 = () => {
                     <img className='w-28' src={assets.group_profiles} alt="" />
                     <p>Với các bác sĩ đáng tin cậy, <br className='hidden sm:block' /> lên lịch cuộc hẹn của bạn một cách dễ dàng.</p>
                 </div>
-                <a href="#speciality" className='flex items-center gap-2 bg-white px-8 py-3 rounded-full text-gray-600 text-sm m-auto md:m-0 hover:scale-105 transition-all duration-300 text-[#00759c]' style={{ marginLeft: '-300px' }}>
+                <a href="#speciality" className='flex items-center gap-2 bg-white px-8 py-3 rounded-full text-[#00759c] text-sm m-auto md:m-0 hover:scale-105 transition-all duration-300 text-[#00759c]' style={{ marginLeft: '-300px' }}>
                     Đặt lịch hẹn <img className='w-3' src={assets.arrow_icon} alt="" />
                 </a>
             </div>

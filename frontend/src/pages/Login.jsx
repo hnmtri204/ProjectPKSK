@@ -1,18 +1,61 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useState } from 'react'
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; 
 
 const Login = () => {
-
-  const [state, setState] = useState('Sign Up')
-
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [name, setName] = useState('')
+  const navigate = useNavigate(); 
+  const [state, setState] = useState('Sign Up');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
-    // Thêm logic xử lý đăng nhập hoặc đăng ký ở đâya
-  }
+
+    const url = state === 'Sign Up' ? 'http://localhost:5000/patient/create' : 'http://localhost:5000/login';
+
+    const requestBody = {
+      email,
+      password,
+      ...(state === 'Sign Up' && { name, phone }) 
+    };
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert(data.message); 
+        
+        switch (data.user.role) {
+          case 'user':
+            navigate('/'); 
+            break;
+          case 'doctor':
+            navigate('/admindoctor'); 
+            break;
+          case 'admin':
+            navigate('/dashboard'); 
+            break;
+          default:
+            navigate('/'); 
+        }
+      } else {
+        alert(data.message || 'Đăng nhập thất bại!');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Đã xảy ra lỗi. Vui lòng thử lại sau.');
+    }
+  };
 
   return (
     <form className='min-h-[80vh] flex items-center' onSubmit={onSubmitHandler}>
@@ -24,6 +67,13 @@ const Login = () => {
           state === "Sign Up" && <div className='w-full'>
             <p>Tên đầy đủ</p>
             <input className='border border-zinc-300 rounded w-full p-2 mt-1' type="text" onChange={(e) => setName(e.target.value)} value={name} required />
+          </div>
+        }
+
+        {
+          state === "Sign Up" && <div className='w-full'>
+            <p>Số điện thoại</p>
+            <input className='border border-zinc-300 rounded w-full p-2 mt-1' type="tel" onChange={(e) => setPhone(e.target.value)} value={phone} required />
           </div>
         }
 
@@ -46,4 +96,4 @@ const Login = () => {
   )
 }
 
-export default Login;
+export default Login; 
