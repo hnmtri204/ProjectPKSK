@@ -5,6 +5,7 @@ const UserRole = require("../../models/User_role");
 const Doctor = require("../../models/Doctor");
 const cloudinary = require("cloudinary").v2;
 const validateDoctor = require("../../requests/validateDoctor");
+const Appointment = require("../../models/Appointment");
 
 //{ key: value } là một đtuong trong js, thường dùng để crud
 /*
@@ -261,10 +262,43 @@ const deleteDoctor = async (req, res) => {
   }
 };
 
+const confirmAppointment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (status === "confirmed" || status === "canceled") {
+      const updatedAppointment = await Appointment.findByIdAndUpdate(
+        id,
+        { status }
+      );
+
+      if (!updatedAppointment) {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
+
+      const afterUpdateAppointment = await Appointment.findById(id);
+      // Gửi phản hồi thành công
+      return res.status(200).json({
+        message: `Appointment ${status}`,
+        appointment: afterUpdateAppointment,
+      });
+    } else {
+      return res.status(400).json({
+        message: "Invalid status. Status must be 'confirmed' or 'canceled'",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+
 module.exports = {
   createDoctor,
   findAllDoctor,
   findDoctor,
   updateDoctor,
   deleteDoctor,
+  confirmAppointment
 };

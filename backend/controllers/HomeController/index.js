@@ -17,6 +17,8 @@ const login = async (req, res) => {
       return res.status(404).json({ message: "User not found!" });
     }
 
+    console.log(user);
+
     // So sánh mật khẩu
     const isMatch = await bcrypt.compare(req.body.password, user.password);
     if (!isMatch) {
