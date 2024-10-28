@@ -39,7 +39,6 @@ const login = async (req, res) => {
         email: user.email,
         role: userRole,
       },
-      user: req.session.user,
     });
   } catch (error) {
     return res.status(500).json({ message: error.message });
