@@ -9,7 +9,7 @@ const {
 } = require("../controllers/DoctorController/index");
 
 // Định nghĩa route
-router.post("/create", upload.single('image'), createDoctor); // Sử dụng middleware upload
+router.post("/create", createDoctor);
 router.get("/find-all", findAllDoctor);
 router.get("/find/:id", findDoctor);
 router.put("/update/:id", updateDoctor);
