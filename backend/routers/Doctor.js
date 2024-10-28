@@ -28,10 +28,10 @@ const {
 const upload = require('../multer-config'); // Import multer config
 
 // Định nghĩa route
-router.post("/create", upload.single('image'), createDoctor); // Sử dụng middleware upload
+router.post("/create", upload.single('image'), createDoctor);
 router.get("/find-all", findAllDoctor);
 router.get("/find/:id", findDoctor);
-router.put("/update/:id", updateDoctor);
+router.put("/update/:id", upload.single('image'), updateDoctor);
 router.delete("/delete/:id", deleteDoctor);
 
 module.exports = router;

@@ -17,11 +17,15 @@ const AppointmentSchema = new mongoose.Schema(
       enum: ['morning', 'afternoon'],
       required: false,
     },
+    work_date: {
+      type: Date,
+      required: false,
+    },
     status: {
       type: String,
       enum: ['pending', 'confirmed', 'cancelled'],
       required: true,
-      default:'confirmed'
+      default:'pending'
     },
   },
   {
