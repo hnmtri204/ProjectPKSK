@@ -102,10 +102,37 @@ const deleteAppointment = async (req, res) => {
   }
 };
 
+
+// const patientCreateAppointment = async (req, res) => {
+//   try {
+   
+
+
+//     const appointment = await Appointment.create({
+//       ...req.body,
+//       patient_id: req.user._id
+//     });
+//     await Appointment_history.create({
+//       status: appointment.status,
+//       appointment_id: appointment._id,
+//       date: appointment.createdAt,
+//       patient_id: appointment.patient_id,
+//       doctor_id: appointment.doctor_id
+//     })
+//     if (appointment) {
+//       return res.status(200).json(appointment);
+//     }
+//     return res.status(400).json({ message: "Appointment not found" });
+//   } catch (error) {
+//     return res.status(500).json({ message: error.message });
+//   }
+// };
+
 module.exports = {
   createAppointment,
   findAllAppointment,
   findAppointment,
   updateAppointment,
   deleteAppointment,
+  // patientCreateAppointment
 };

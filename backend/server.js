@@ -3,10 +3,12 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cloudinary = require ( 'cloudinary' ). v2 ; 
 const upload = require ( './multer-config' ); 
+const session = require('express-session');
 
 const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
 const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
 const CLOUDINARY_API_SECRET  = process.env.CLOUDINARY_API_SECRET ;
+const SESSION_SECRET = process.env.SESSION_SECRET
 
 
 const userRouterRole = require("./routers/Role");
@@ -32,6 +34,15 @@ mongoose
 
 //data json
 app.use(express.json());
+
+//session
+app.use(session({
+  secret: SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: true }
+}));
+
 
 //user route
 app.use("/role", userRouterRole);
