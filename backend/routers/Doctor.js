@@ -23,7 +23,8 @@ const {
   findAllDoctor,
   findDoctor,
   updateDoctor,
-  deleteDoctor
+  deleteDoctor,
+  confirmAppointment
 } = require("../controllers/DoctorController/index");
 const upload = require('../multer-config'); // Import multer config
 
@@ -33,5 +34,6 @@ router.get("/find-all", findAllDoctor);
 router.get("/find/:id", findDoctor);
 router.put("/update/:id", upload.single('image'), updateDoctor);
 router.delete("/delete/:id", deleteDoctor);
+router.put("/confirm-appointment/:id", confirmAppointment);
 
 module.exports = router;
