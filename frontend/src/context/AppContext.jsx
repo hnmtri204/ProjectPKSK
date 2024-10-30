@@ -5,11 +5,14 @@ export const AppContext = createContext();
 
 const AppContextProvider = (props) => {
     const [doctors, setDoctors] = useState([]);
+    const [user, setUser] = useState(null); 
     const currencySymbol = '$';
 
     const value = {
         doctors,
-        setDoctors, 
+        setDoctors,
+        user, 
+        setUser, 
         currencySymbol
     };
 
