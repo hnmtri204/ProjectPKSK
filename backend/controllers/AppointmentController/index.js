@@ -1,6 +1,9 @@
 const Appointment = require("../../models/Appointment");
 const Appointment_history = require("../../models/Appointment_history");
 const validateAppointment = require("../../requests/validateAppointment");
+const Patient = require("../../models/Patient");
+const Doctor = require("../../models/Doctor");
+const Notification = require("../../models/Notification");
 
 const createAppointment = async (req, res) => {
   try {
@@ -16,8 +19,8 @@ const createAppointment = async (req, res) => {
       appointment_id: appointment._id,
       date: appointment.createdAt,
       patient_id: appointment.patient_id,
-      doctor_id: appointment.doctor_id
-    })
+      doctor_id: appointment.doctor_id,
+    });
     if (appointment) {
       return res.status(200).json(appointment);
     }
@@ -61,23 +64,30 @@ const updateAppointment = async (req, res) => {
     }
 
     const { id } = req.params;
-    const appointment = await Appointment.findByIdAndUpdate(id, req.body, { new: true });
-    
+    const appointment = await Appointment.findByIdAndUpdate(id, req.body, {
+      new: true,
+    });
+
     if (!appointment) {
       return res.status(400).json({ message: "Appointment not found" });
     }
 
     await Appointment_history.findOneAndUpdate(
-      { appointment_id: appointment._id }, 
+      { appointment_id: appointment._id },
       {
         status: appointment.status,
         appointment_id: appointment._id,
         date: appointment.updatedAt,
         patient_id: appointment.patient_id,
-        doctor_id: appointment.doctor_id
+        doctor_id: appointment.doctor_id,
       },
       { new: true } // Trả về bản ghi đã cập nhật
     );
+
+    const notification = await Notification.create({
+      content: `Your appointment changed`,
+      new_date: appointment.work_date,
+    });
 
     const appointmentUpdate = await Appointment.findById(id);
     return res.status(200).json(appointmentUpdate);
@@ -85,7 +95,6 @@ const updateAppointment = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
 
 const deleteAppointment = async (req, res) => {
   try {
@@ -95,38 +104,71 @@ const deleteAppointment = async (req, res) => {
       return res.status(400).json({ message: "Appointment not found" });
     }
     await Appointment.findByIdAndDelete(id);
-    await Appointment_history.findOneAndDelete({ appointment_id: appointment._id });
+    await Appointment_history.findOneAndDelete({
+      appointment_id: appointment._id,
+    });
     return res.status(200).json({ message: "Delete appointment success!" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };
 
+const patientCreateAppointment = async (req, res) => {
+  try {
+    const appointment = await Appointment.create({
+      ...req.body,
+      patient_id: req.user.id,
+    });
+    await Appointment_history.create({
+      status: appointment.status,
+      appointment_id: appointment._id,
+      date: appointment.createdAt,
+      patient_id: appointment.patient_id,
+      doctor_id: appointment.doctor_id,
+    });
+    if (appointment) {
+      return res.status(200).json(appointment);
+    }
+    return res.status(400).json({ message: "Appointment not found" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
-// const patientCreateAppointment = async (req, res) => {
-//   try {
-   
+const getCurrentUserAppointments = async (req, res) => {
+  try {
+    const user_id = req.user?.id;
+    const user_role = req.user?.role;
+    if (!user_id) {
+      return res.status(401).json({ message: "User not authenticated" });
+    }
+    if (user_role === "patient") {
+      const patient = await Patient.findOne({ user_id: user_id });
+      if (!patient) {
+        return res.status(400).json({ message: "User not found" });
+      }
+      const appointments = await Appointment.find({ patient_id: patient._id });
+      if (appointments.length > 0) {
+        return res.status(200).json(appointments);
+      }
+    } else if (user_role === "doctor") {
+      const doctor = await Doctor.findOne({ user_id: user_id });
+      if (!doctor) {
+        return res.status(400).json({ message: "Doctor not found" });
+      }
+
+      const appointments = await Appointment.find({ doctor_id: doctor._id });
+      if (appointments.length > 0) {
+        return res.status(200).json(appointments);
+      }
+    }
+    return res.status(404).json({ message: "No appointments found" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 
-//     const appointment = await Appointment.create({
-//       ...req.body,
-//       patient_id: req.user._id
-//     });
-//     await Appointment_history.create({
-//       status: appointment.status,
-//       appointment_id: appointment._id,
-//       date: appointment.createdAt,
-//       patient_id: appointment.patient_id,
-//       doctor_id: appointment.doctor_id
-//     })
-//     if (appointment) {
-//       return res.status(200).json(appointment);
-//     }
-//     return res.status(400).json({ message: "Appointment not found" });
-//   } catch (error) {
-//     return res.status(500).json({ message: error.message });
-//   }
-// };
 
 module.exports = {
   createAppointment,
@@ -134,5 +176,6 @@ module.exports = {
   findAppointment,
   updateAppointment,
   deleteAppointment,
-  // patientCreateAppointment
+  patientCreateAppointment,
+  getCurrentUserAppointments
 };
