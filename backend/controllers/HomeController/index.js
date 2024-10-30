@@ -17,7 +17,7 @@ const login = async (req, res) => {
       return res.status(404).json({ message: "User not found!" });
     }
 
-    console.log(user);
+    // console.log(user);
 
     // So sánh mật khẩu
     const isMatch = await bcrypt.compare(req.body.password, user.password);
@@ -27,7 +27,7 @@ const login = async (req, res) => {
 
     // Lấy danh sách role của người dùng
     const roleUsers = await RoleUser.find({ user_id: user._id }).populate('role_id');
-    console.log(roleUsers);
+    // console.log(roleUsers);
 
     // Lấy role đầu tiên (nếu có)
     const userRole = roleUsers.length > 0 ? roleUsers[0].role_id.name : null;
@@ -42,7 +42,7 @@ const login = async (req, res) => {
 
     return res.status(200).json({
       message: "Login successful!",
-      user: req.session.user, // Gửi thông tin người dùng đã lưu trong session
+      user: req.session.user,
     });
   } catch (error) {
     return res.status(500).json({ message: error.message });

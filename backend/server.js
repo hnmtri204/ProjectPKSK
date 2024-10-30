@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cloudinary = require ( 'cloudinary' ). v2 ; 
-const upload = require ( './multer-config' ); 
+const upload = require ( './helpers/multer-config' ); 
 const session = require('express-session');
 
 const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
@@ -40,7 +40,7 @@ app.use(session({
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: true }
+  cookie: { secure: false }
 }));
 
 
