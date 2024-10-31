@@ -142,7 +142,7 @@ const profilePatient = async (req, res) => {
     if (!req.session.user) {
       return res.status(401).json({ message: "User not authenticated" });
     }
-
+    const user_id = req.user.id;
     // Lấy tất cả thông tin từ session
     const userInfo = req.session.user;
 

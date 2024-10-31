@@ -4,6 +4,11 @@ const validateAppointment = require("../../requests/validateAppointment");
 const Patient = require("../../models/Patient");
 const Doctor = require("../../models/Doctor");
 const Notification = require("../../models/Notification");
+const transporter = require("../../helpers/mailer-config");
+const User = require("../../models/User");
+const moment = require("moment-timezone");
+const User_role = require("../../models/User_role");
+const Role = require("../../models/Role");
 
 const createAppointment = async (req, res) => {
   try {
@@ -81,13 +86,42 @@ const updateAppointment = async (req, res) => {
         patient_id: appointment.patient_id,
         doctor_id: appointment.doctor_id,
       },
-      { new: true } // Trả về bản ghi đã cập nhật
+      { new: true }
     );
 
-    const notification = await Notification.create({
-      content: `Your appointment changed`,
+    await Notification.create({
+      content: `Your appointment has been changed.`,
       new_date: appointment.work_date,
+      new_work_shift: appointment.work_shift,
     });
+
+    // Gửi email cho bệnh nhân
+    const patient = await Patient.findById(appointment.patient_id);
+    const doctor = await Doctor.findById(appointment.doctor_id);
+    const patientInfo = await User.findOne({ _id: patient.user_id });
+    const doctorInfo = await User.findOne({ _id: doctor.user_id });
+
+    const vietnamTime = moment(appointment.work_date)
+      .tz("Asia/Ho_Chi_Minh")
+      .format("dddd, MMMM DD YYYY");
+
+    const mailOptionsPatient = {
+      from: process.env.EMAIL_USER,
+      to: patientInfo.email,
+      subject: "Notification Appointment",
+      text: `Dear Patient, your appointment has been updated. \nNew date: ${vietnamTime}. \nTime: ${appointment.work_shift}.`,
+    };
+
+    const mailOptionsDoctor = {
+      from: process.env.EMAIL_USER,
+      to: doctorInfo.email,
+      subject: "Notification Appointment",
+      text: `Dear Doctor, your appointment with patient has been updated. \nNew date: ${vietnamTime}. \nTime: ${appointment.work_shift}.`,
+    };
+
+    // Gửi email
+    await transporter.sendMail(mailOptionsPatient);
+    await transporter.sendMail(mailOptionsDoctor);
 
     const appointmentUpdate = await Appointment.findById(id);
     return res.status(200).json(appointmentUpdate);
@@ -168,7 +202,117 @@ const getCurrentUserAppointments = async (req, res) => {
   }
 };
 
+const processPrematureCancellation = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const appointment = await Appointment.findById(id);
 
+    if (!appointment) {
+      return res.status(400).json({ message: "Appointment not found" });
+    }
+
+    // Lấy thời gian hiện tại và thời gian hẹn
+    const now = new Date();
+    const appointmentDate = new Date(appointment.work_date); // Giả định work_date là trường lưu thời gian hẹn
+
+    // Kiểm tra xem lịch hẹn có còn hơn 1 ngày nữa không
+    const timeDifference = appointmentDate - now;
+    const oneDayInMillis = 24 * 60 * 60 * 1000; // 1 ngày tính bằng milliseconds
+
+    if (timeDifference <= oneDayInMillis) {
+      return res.status(400).json({
+        message: "You can only cancel appointments more than 1 day in advance.",
+      });
+    }
+
+    // Xóa lịch hẹn và lịch sử
+    await Appointment.findByIdAndDelete(id);
+    await Appointment_history.findOneAndDelete({
+      appointment_id: appointment._id,
+    });
+
+    return res.status(200).json({ message: "Delete appointment success!" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const showUpcomingAppointments = async (req, res) => {
+  try {
+    const user_id = req.user?.id;
+    if (!user_id) {
+      return res.status(401).json({ message: "User not authenticated" });
+    }
+
+    const user_role = await User_role.findOne({ user_id: user_id });
+    if (!user_role) {
+      return res.status(403).json({ message: "User role not found" });
+    }
+
+    const role = await Role.findOne({ _id: user_role.role_id });
+    if (!role) {
+      return res.status(403).json({ message: "Role not found" });
+    }
+
+    const now = new Date();
+    let upcomingAppointments;
+
+    if (role.name === "admin") {
+      upcomingAppointments = await Appointment.find({
+        work_date: { $gte: now }, // Lấy các lịch hẹn có thời gian từ hiện tại trở đi
+      }).sort({ work_date: 1 }); // Sắp xếp theo thời gian hẹn từ sớm đến muộn
+    } else {
+      const doctor = await Doctor.findOne({ user_id: user_id });
+      if (!doctor) {
+        return res.status(403).json({ message: "Doctor not found" });
+      }
+      upcomingAppointments = await Appointment.find({
+        doctor_id: doctor._id,
+        work_date: { $gte: now }, // Lấy các lịch hẹn có thời gian từ hiện tại trở đi
+      }).sort({ work_date: 1 }); // Sắp xếp theo thời gian hẹn từ sớm đến muộn
+    }
+
+    return res.status(200).json(upcomingAppointments);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const getAppointmentByStatus = async (req, res) => {
+  try {
+    const user_id = req.user?.id;
+    if (!user_id) {
+      return res.status(401).json({ message: "User not authenticated" });
+    }
+
+    const user_role = await User_role.findOne({ user_id: user_id });
+    if (!user_role) {
+      return res.status(403).json({ message: "User role not found" });
+    }
+
+    const role = await Role.findOne({ _id: user_role.role_id });
+    if (!role) {
+      return res.status(403).json({ message: "Role not found" });
+    }
+    let appointments;
+    if (role.name === "admin") {
+      appointments = await Appointment.find({
+        status: "confirmed" || "finished",
+      });
+    } else {
+      const doctor = await Doctor.findOne({ user_id: user_id });
+      if (!doctor) {
+        return res.status(403).json({ message: "Doctor not found" });
+      }
+      appointments = await Appointment.find({
+        status: "confirmed" || "finished", doctor_id: doctor._id
+      });
+    }
+    return res.status(200).json(appointments);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 module.exports = {
   createAppointment,
@@ -177,5 +321,8 @@ module.exports = {
   updateAppointment,
   deleteAppointment,
   patientCreateAppointment,
-  getCurrentUserAppointments
+  getCurrentUserAppointments,
+  processPrematureCancellation,
+  showUpcomingAppointments,
+  getAppointmentByStatus
 };
