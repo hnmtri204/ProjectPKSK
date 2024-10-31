@@ -1,234 +1,130 @@
-// // eslint-disable-next-line no-unused-vars
-// import React, { useState } from 'react'
-// import { assets } from '../assets/assets'
-
-// const MyProfile = () => {
-
-//   const [userData, setUserData] = useState({
-//     name: "Le Quy Thien",
-//     image: assets.profile_pic,
-//     email: 'lequythien1@gmail.com',
-//     phone: '+84-365-142-649',
-//     address: {
-//       line1: "57th Cross, Richmond",
-//       line2: "Circle, Church Road, London"
-//     },
-//     gender: 'Male',
-//     dob: '2004-06-16'
-//   })
-
-//   const [isEdit, setIsEdit] = useState(false)
-
-//   return (
-//     <div className='max-w-lg flex flex-col gap-2 text-sm'>
-
-//       <img className='w-36 rounded' src={userData.image} alt="" />
-
-//       {
-//         isEdit
-//           ? <input className='bg-gray-50 text-3xl font-medium max-w-60 mt-4' type="text" value={userData.name} onChange={e => setUserData(prev => ({ ...prev, name: e.target.value }))} />
-//           : <p className='font-medium text-3xl text-neutral-800 mt-4'>{userData.name}</p>
-//       }
-
-//       <hr className='bg-zinc-400 h-[1px] border-none' />
-//       <div>
-//         <p className='text-neutral-500 underline mt-3'>THÔNG TIN LIÊN HỆ</p>
-//         <div className='grid grid-cols-[1fr_3fr] gap-y-2.5 mt-3 text-neutral-700'>
-//           <p className='font-medium'>Email id:</p>
-//           <p className='text-blue-500'>{userData.email}</p>
-//           <p className='font-medium'>Điện thoại:</p>
-//           {
-//             isEdit
-//               ? <input className='bg-gray-100 max-w-52' type="text" value={userData.phone} onChange={e => setUserData(prev => ({ ...prev, phone: e.target.value }))} />
-//               : <p className='text-blue-400'>{userData.phone}</p>
-//           }
-//           <p className='font-medium'>Địa chỉ:</p>
-//           {
-//             isEdit
-//               ? <p>
-//                 <input className='bg-gray-50' onChange={(e) => setUserData(prev => ({ ...prev, address: { ...prev.address, line1: e.target.value } }))} value={userData.address.line1} type="text" />
-//                 <br />
-//                 <input className='bg-gray-50' onChange={(e) => setUserData(prev => ({ ...prev, address: { ...prev.address, line2: e.target.value } }))} value={userData.address.line2} type="text" />
-//               </p>
-//               : <p className='text-gray-500'>
-//                 {userData.address.line1}
-//                 <br />
-//                 {userData.address.line2}
-//               </p>
-//           }
-//         </div>
-//       </div>
-//       <div>
-//         <p className='text-neutral-500 underline mt-3'>THÔNG TIN CƠ BẢN</p>
-//         <div className='grid grid-cols-[1fr_3fr] gap-y-2.5 mt-3 text-neutral-700'>
-//           <p className='font-medium'>Giới tính:</p>
-//           {
-//             isEdit
-//               ? <select className='max-w-20 bg-gray-100' onChange={(e) => setUserData(prev => ({ ...prev, gender: e.target.value }))} value={userData.gender}>
-//                 <option value="Male">Nam</option>
-//                 <option value="Female">Nữ</option>
-//               </select>
-//               : <p className='text-gray-400'>{userData.gender}</p>
-//           }
-//           <p className='font-medium'>Ngày sinh:</p>
-//           {
-//             isEdit
-//               ? <input className='max-w-28 bg-gray-100' type="date" onChange={(e) => setUserData(prev => ({ ...prev, dob: e.target.value }))} value={userData.dob} />
-//               : <p className='text-gray-400'>{userData.dob}</p>
-//           }
-//         </div>
-//       </div>
-
-//       <div className='mt-10'>
-//         {
-//           isEdit
-//             ? <button className='border border-primary px-8 py-2 rounded-full text-black hover:bg-primary hover:text-white transition-all' onClick={() => setIsEdit(false)}>Lưu thông tin</button>
-//             : <button className='border border-primary px-8 py-2 rounded-full text-black hover:bg-primary hover:text-white transition-all' onClick={() => setIsEdit(true)}>Chỉnh sửa</button>
-//         }
-//       </div>
-
-//     </div>
-//   )
-// }
-
-// export default MyProfile
-
-
-
 // eslint-disable-next-line no-unused-vars
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+import { assets } from '../assets/assets';
+import { AppContext } from '../context/AppContext';
 
 const MyProfile = () => {
-    const [user, setUser] = useState(null); 
+    const { user, setUser } = useContext(AppContext);
+    const [userData, setUserData] = useState({
+        name: "",
+        image: assets.profile_pic,
+        email: "",
+        phone: "",
+        gender: "Male",
+        dob: "",
+        password: "" // Thêm trường password
+    });
     const [isEdit, setIsEdit] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
+    // Cập nhật userData khi user thay đổi
     useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const response = await fetch('http://localhost:5000/profilePatient'); // Fetch user data from the endpoint
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                setUser(data.user); // Assuming user data is under data.user
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-            }
-        };
+        if (user) {
+            setUserData({
+                name: user.name,
+                image: assets.profile_pic,
+                email: user.email,
+                phone: user.phone,
+                gender: user.gender,
+                dob: user.dob,
+                password: "" // Đặt password mặc định là rỗng khi hiển thị
+            });
+        }
+    }, [user]);
 
-        fetchUserData();
-    }, []); // Fetch data only once when the component mounts
-
-    if (!user) {
-        return <div>Loading...</div>; // Show loading while fetching data
-    }
-
+    // Hàm lưu thông tin người dùng
     const handleSave = async () => {
+        if (!user) {
+            setErrorMessage('Bạn chưa đăng nhập. Vui lòng đăng nhập để tiếp tục.');
+            return; // Ngừng thực hiện nếu người dùng chưa xác thực
+        }
+    
         try {
+            console.log('User Data to Update:', userData); // Ghi lại dữ liệu để kiểm tra
             const response = await fetch('http://localhost:5000/updateProfilePatient', {
-                method: 'PUT', // or 'PATCH' depending on your API
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${user.token}` // Thêm token vào header
                 },
-                body: JSON.stringify(user), // Send the updated user data
+                body: JSON.stringify(userData), // Chuyển đổi userData thành JSON
             });
-
+    
             if (!response.ok) {
-                throw new Error('Failed to update user data');
+                const errorData = await response.json();
+                console.error('Server Response:', errorData); // Ghi lại phản hồi từ server
+                setErrorMessage(errorData.message || 'Failed to update profile');
+                return; // Ngừng thực hiện nếu có lỗi
             }
-
-            const updatedUser = await response.json(); // Get the updated user data back
-            setUser(updatedUser); // Update the local state with the saved user data
-            setIsEdit(false); // Exit edit mode
+    
+            const updatedUser = await response.json();
+            setUser(updatedUser);
+            sessionStorage.setItem('userData', JSON.stringify(updatedUser));
+            setIsEdit(false);
+            setErrorMessage("");
         } catch (error) {
-            console.error('Error saving user data:', error);
+            console.error('Error updating user profile:', error);
+            setErrorMessage('Có lỗi xảy ra: ' + error.message); // Hiển thị thông báo lỗi cụ thể
         }
     };
 
+    // Kiểm tra xem người dùng đã đăng nhập hay chưa
+    if (!user) {
+        return <p className='text-red-500'>Bạn chưa đăng nhập. Vui lòng đăng nhập để tiếp tục.</p>;
+    }
+
     return (
         <div className='max-w-lg flex flex-col gap-2 text-sm'>
-            <img className='w-36 rounded' src={user.image || 'default_profile_image_url'} alt="User Profile" />
- 
+            <p className='text-lg'>Welcome, {user.name}!</p>
+            <img className='w-36 rounded' src={userData.image || assets.profile_pic} alt="Profile" />
             {isEdit ? (
                 <input
                     className='bg-gray-50 text-3xl font-medium max-w-60 mt-4'
                     type="text"
-                    value={user.name}
-                    onChange={e => setUser(prev => ({ ...prev, name: e.target.value }))} // Update name
+                    value={userData.name}
+                    onChange={e => setUserData(prev => ({ ...prev, name: e.target.value }))} // Cập nhật tên
                 />
             ) : (
-                <p className='font-medium text-3xl text-neutral-800 mt-4'>{user.name}</p>
+                <p className='font-medium text-3xl text-neutral-800 mt-4'>{userData.name}</p>
             )}
- 
             <hr className='bg-zinc-400 h-[1px] border-none' />
- 
             <div>
                 <p className='text-neutral-500 underline mt-3'>THÔNG TIN LIÊN HỆ</p>
                 <div className='grid grid-cols-[1fr_3fr] gap-y-2.5 mt-3 text-neutral-700'>
-                    <p className='font-medium'>Email:</p>
-                    <p className='text-blue-500'>{user.email}</p>
-                    <p className='font-medium'>Điện thoại:</p>
+                    <p className='font-medium'>Email id:</p>
                     {isEdit ? (
                         <input
                             className='bg-gray-100 max-w-52'
-                            type="text"
-                            value={user.phone}
-                            onChange={e => setUser(prev => ({ ...prev, phone: e.target.value }))} // Update phone
+                            type="email"
+                            value={userData.email}
+                            onChange={e => setUserData(prev => ({ ...prev, email: e.target.value }))} // Cập nhật email
                         />
                     ) : (
-                        <p className='text-blue-400'>{user.phone}</p>
+                        <p>{userData.email}</p>
                     )}
-                </div>
-            </div>
- 
-            {/* Basic Information */}
-            <div>
-                <p className='text-neutral-500 underline mt-3'>THÔNG TIN CƠ BẢN</p>
-                <div className='grid grid-cols-[1fr_3fr] gap-y-2.5 mt-3 text-neutral-700'>
-                    <p className='font-medium'>Giới tính:</p>
-                    {isEdit ? (
-                        <select
-                            className='max-w-20 bg-gray-100'
-                            onChange={e => setUser(prev => ({ ...prev, gender: e.target.value }))} // Update gender
-                            value={user.gender}
-                        >
-                            <option value="Male">Nam</option>
-                            <option value="Female">Nữ</option>
-                        </select>
-                    ) : (
-                        <p className='text-gray-400'>{user.gender}</p>
-                    )}
-                    <p className='font-medium'>Ngày sinh:</p>
+                    <p className='font-medium'>Số điện thoại:</p>
                     {isEdit ? (
                         <input
-                            className='max-w-28 bg-gray-100'
-                            type="date"
-                            onChange={e => setUser(prev => ({ ...prev, dob: e.target.value }))} // Update DOB
-                            value={user.dob}
+                            className='bg-gray-100 max-w-52'
+                            type="tel"
+                            value={userData.phone}
+                            onChange={e => setUserData(prev => ({ ...prev, phone: e.target.value }))} // Cập nhật số điện thoại
                         />
                     ) : (
-                        <p className='text-gray-400'>{user.dob}</p>
+                        <p>{userData.phone}</p>
                     )}
                 </div>
+                {isEdit && errorMessage && <p className='text-red-500'>{errorMessage}</p>} {/* Hiển thị thông báo lỗi */}
             </div>
- 
-            <div className='mt-10'>
-                {isEdit ? (
-                    <button
-                        className='border border-primary px-8 py-2 rounded-full text-black hover:bg-primary hover:text-white transition-all'
-                        onClick={handleSave} // Save updated information
-                    >
-                        Lưu thông tin
-                    </button>
-                ) : (
-                    <button
-                        className='border border-primary px-8 py-2 rounded-full text-black hover:bg-primary hover:text-white transition-all'
-                        onClick={() => setIsEdit(true)} // Enable edit mode
-                    >
-                        Chỉnh sửa
-                    </button>
-                )}
-            </div>
+            <button
+                onClick={() => {
+                    if (isEdit) handleSave(); // Gọi hàm lưu nếu đang ở chế độ chỉnh sửa
+                    setIsEdit(!isEdit); // Đổi trạng thái chỉnh sửa
+                }}
+                className='bg-blue-500 text-white rounded-md py-2 mt-4'
+            >
+                {isEdit ? 'Lưu' : 'Chỉnh sửa'}
+            </button>
         </div>
     );
 };

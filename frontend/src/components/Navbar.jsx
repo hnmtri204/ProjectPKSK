@@ -1,24 +1,25 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useState } from 'react';
 import { useContext } from 'react';
-import { AppContext } from '../context/AppContext'; 
+import { AppContext } from '../context/AppContext';
 import { assets } from '../assets/assets';
 import { NavLink, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
     const navigate = useNavigate();
-    const { user, setUser } = useContext(AppContext); 
+    const { user, setUser } = useContext(AppContext);
 
-    const [showMenu, setShowMenu] = useState(false); 
+    const [showMenu, setShowMenu] = useState(false);
 
     const handleLogout = () => {
         sessionStorage.removeItem('user');
-        setUser(null); 
+        setUser(null);
         navigate('/login');
     };
 
     return (
         <div className='flex items-center justify-between text-sm py-4 mb-5 border-b border-b-gray-400'>
+            {/* Thanh điều hướng chính */}
             <img
                 onClick={() => navigate('/')}
                 className='w-44 cursor-pointer'
@@ -26,6 +27,7 @@ const Navbar = () => {
                 alt=""
                 style={{ width: "80px", height: "80px", objectFit: "contain" }}
             />
+            {/* Danh sách liên kết điều hướng */}
             <ul className={`md:flex items-start gap-5 font-medium ${showMenu ? 'flex' : 'hidden'}`}>
                 <NavLink to='/'>
                     <li className='py-1'>Trang chủ</li>
