@@ -115,6 +115,7 @@ const updatePatient = async (req, res) => {
   }
 };
 
+
 const deletePatient = async (req, res) => {
   try {
     const { id } = req.params;

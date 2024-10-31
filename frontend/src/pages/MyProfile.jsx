@@ -1,81 +1,80 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import { assets } from '../assets/assets';
-import { AppContext } from '../context/AppContext';
 
 const MyProfile = () => {
-    const { user, setUser } = useContext(AppContext);
     const [userData, setUserData] = useState({
         name: "",
         image: assets.profile_pic,
         email: "",
         phone: "",
-        gender: "Male",
-        dob: "",
         password: "" // Thêm trường password
     });
     const [isEdit, setIsEdit] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
 
-    // Cập nhật userData khi user thay đổi
+    // Cập nhật userData khi component mount
     useEffect(() => {
+        const user = JSON.parse(sessionStorage.getItem('user'));
         if (user) {
             setUserData({
                 name: user.name,
                 image: assets.profile_pic,
                 email: user.email,
                 phone: user.phone,
-                gender: user.gender,
-                dob: user.dob,
-                password: "" // Đặt password mặc định là rỗng khi hiển thị
+                password: ""
             });
+        } else {
+            setErrorMessage('Bạn chưa đăng nhập. Vui lòng đăng nhập để tiếp tục.');
         }
-    }, [user]);
+    }, []);
 
     // Hàm lưu thông tin người dùng
     const handleSave = async () => {
+        const user = JSON.parse(sessionStorage.getItem('user'));
         if (!user) {
             setErrorMessage('Bạn chưa đăng nhập. Vui lòng đăng nhập để tiếp tục.');
             return; // Ngừng thực hiện nếu người dùng chưa xác thực
         }
-    
+
         try {
             console.log('User Data to Update:', userData); // Ghi lại dữ liệu để kiểm tra
+            const token = sessionStorage.getItem('token');
+            console.log('Token:', token); // Đảm bảo token không phải là null hoặc undefined
             const response = await fetch('http://localhost:5000/updateProfilePatient', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${user.token}` // Thêm token vào header
+                    'Authorization': `Bearer ${token}`, // Thêm token vào header
                 },
-                body: JSON.stringify(userData), // Chuyển đổi userData thành JSON
+                body: JSON.stringify({
+                    id: user.id, // Hoặc bất kỳ thông tin nào khác cần thiết
+                    name: userData.name,
+                    phone: userData.phone,
+                    email: userData.email,
+                }),
             });
-    
+
             if (!response.ok) {
-                const errorData = await response.json();
-                console.error('Server Response:', errorData); // Ghi lại phản hồi từ server
-                setErrorMessage(errorData.message || 'Failed to update profile');
+                const errorText = await response.text(); // Đọc phản hồi dưới dạng text để kiểm tra lỗi
+                console.error('Error response:', errorText); // Ghi lại phản hồi từ server
+                setErrorMessage('Có lỗi xảy ra: ' + errorText); // Hiển thị thông báo lỗi
                 return; // Ngừng thực hiện nếu có lỗi
             }
-    
-            const updatedUser = await response.json();
-            setUser(updatedUser);
-            sessionStorage.setItem('userData', JSON.stringify(updatedUser));
-            setIsEdit(false);
-            setErrorMessage("");
+
+            const updatedUser = await response.json(); // Chỉ phân tích JSON nếu không có lỗi
+            sessionStorage.setItem('user', JSON.stringify(updatedUser)); // Cập nhật lại user trong sessionStorage
+            setIsEdit(false); // Đặt lại trạng thái chỉnh sửa
+            setErrorMessage(""); // Xóa thông báo lỗi
         } catch (error) {
             console.error('Error updating user profile:', error);
             setErrorMessage('Có lỗi xảy ra: ' + error.message); // Hiển thị thông báo lỗi cụ thể
         }
     };
 
-    // Kiểm tra xem người dùng đã đăng nhập hay chưa
-    if (!user) {
-        return <p className='text-red-500'>Bạn chưa đăng nhập. Vui lòng đăng nhập để tiếp tục.</p>;
-    }
-
     return (
         <div className='max-w-lg flex flex-col gap-2 text-sm'>
-            <p className='text-lg'>Welcome, {user.name}!</p>
+            <p className='text-lg'>Welcome, {userData.name}!</p>
             <img className='w-36 rounded' src={userData.image || assets.profile_pic} alt="Profile" />
             {isEdit ? (
                 <input
