@@ -1,24 +1,11 @@
-// mailer.js
 const nodemailer = require('nodemailer');
-const PASSWORD_MAILER = process.env.PASSWORD_MAILER;
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'ngongocthang18082004@gmail.com',
-        pass: 'PASSWORD_MAILER',
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
     },
 });
 
-const sendNotification = (email, subject, message) => {
-    const mailOptions = {
-        from: 'ngongocthang18082004@gmail.com',
-        to: email,
-        subject: subject,
-        text: message,
-    };
-
-    return transporter.sendMail(mailOptions);
-};
-
-module.exports = sendNotification;
+module.exports = transporter;
