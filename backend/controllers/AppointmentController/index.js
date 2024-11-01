@@ -149,9 +149,10 @@ const deleteAppointment = async (req, res) => {
 
 const patientCreateAppointment = async (req, res) => {
   try {
+    const patient = await Patient.findOne({ user_id: req.user.id });
     const appointment = await Appointment.create({
       ...req.body,
-      patient_id: req.user.id,
+      patient_id: patient.id,
     });
     await Appointment_history.create({
       status: appointment.status,
@@ -169,19 +170,66 @@ const patientCreateAppointment = async (req, res) => {
   }
 };
 
+// const getCurrentUserAppointments = async (req, res) => {
+//   try {
+//     const user_id = req.user?.id;
+//     console.log(user_id);
+//     const user_role = req.user?.role;
+//     console.log(user_role);
+
+//     let appointments;
+
+//     if (!user_id) {
+//       return res.status(401).json({ message: "User not authenticated" });
+//     }
+//     if (user_role === "patient") {
+//       const patient = await Patient.findOne({ user_id: user_id });
+//       if (!patient) {
+//         return res.status(400).json({ message: "User not found" });
+//       }
+//       appointments = await Appointment.find({ patient_id: patient._id });
+//       if (appointments.length > 0) {
+//         return res.status(200).json(appointments);
+//       }
+//     } else if (user_role === "doctor") {
+//       const doctor = await Doctor.findOne({ user_id: user_id });
+//       if (!doctor) {
+//         return res.status(400).json({ message: "Doctor not found" });
+//       }
+
+//       appointments = await Appointment.find({ doctor_id: doctor._id });
+//       if (appointments.length > 0) {
+//         return res.status(200).json(appointments);
+//       }
+//     }
+//     return res.status(404).json({ message: "Appointments not found" });
+//   } catch (error) {
+//     return res.status(500).json({ message: error.message });
+//   }
+// };
+
+
 const getCurrentUserAppointments = async (req, res) => {
   try {
     const user_id = req.user?.id;
+    console.log("User ID:", user_id);
     const user_role = req.user?.role;
+    console.log("User Role:", user_role);
+
+    let appointments;
+
     if (!user_id) {
       return res.status(401).json({ message: "User not authenticated" });
     }
     if (user_role === "patient") {
       const patient = await Patient.findOne({ user_id: user_id });
+      console.log("Patient:", patient);
       if (!patient) {
-        return res.status(400).json({ message: "User not found" });
+        return res.status(400).json({ message: "Patient not found" });
       }
-      const appointments = await Appointment.find({ patient_id: patient._id });
+
+      appointments = await Appointment.find({ doctor_id: patient._id });
+      console.log("Patient Appointments:", appointments);
       if (appointments.length > 0) {
         return res.status(200).json(appointments);
       }
@@ -191,16 +239,20 @@ const getCurrentUserAppointments = async (req, res) => {
         return res.status(400).json({ message: "Doctor not found" });
       }
 
-      const appointments = await Appointment.find({ doctor_id: doctor._id });
+      appointments = await Appointment.find({ doctor_id: doctor._id });
+      console.log("Doctor Appointments:", appointments);
       if (appointments.length > 0) {
         return res.status(200).json(appointments);
       }
     }
-    return res.status(404).json({ message: "No appointments found" });
+    return res.status(404).json({ message: "Appointments not found" });
   } catch (error) {
+    console.error("Error fetching appointments:", error);
     return res.status(500).json({ message: error.message });
   }
 };
+
+
 
 const processPrematureCancellation = async (req, res) => {
   try {
@@ -305,7 +357,8 @@ const getAppointmentByStatus = async (req, res) => {
         return res.status(403).json({ message: "Doctor not found" });
       }
       appointments = await Appointment.find({
-        status: "confirmed" || "finished", doctor_id: doctor._id
+        status: "confirmed" || "finished",
+        doctor_id: doctor._id,
       });
     }
     return res.status(200).json(appointments);
@@ -324,5 +377,5 @@ module.exports = {
   getCurrentUserAppointments,
   processPrematureCancellation,
   showUpcomingAppointments,
-  getAppointmentByStatus
+  getAppointmentByStatus,
 };
