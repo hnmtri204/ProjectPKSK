@@ -3,14 +3,14 @@ const router = express.Router();
 const {
   login,
   logout,
+  filter
 } = require("../controllers/HomeController/index");
 const {
   patientCreateAppointment, 
   getCurrentUserAppointments,
   processPrematureCancellation,
   showUpcomingAppointments,
-  getAppointmentByStatus,
-  getAppointmentByDoctor
+  getAppointmentByStatus
 } = require("../controllers/AppointmentController/index");
 const {profilePatient, updateProfilePatient} = require("../controllers/PatientController/index");
 const userMiddleware = require("../middlewares/index");
@@ -31,5 +31,6 @@ router.get("/show-upcoming-appointments", userMiddleware, showUpcomingAppointmen
 router.get("/show-upcoming-appointments", userMiddleware, showUpcomingAppointments);
 router.get("/get-appointments-status", userMiddleware, getAppointmentByStatus);
 router.get("/get-appointments-doctor/:id", getScheduleByDoctor);
+router.get("/filter/:id", filter);
 
 module.exports = router;
