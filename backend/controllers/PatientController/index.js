@@ -84,6 +84,37 @@ const findPatient = async (req, res) => {
   }
 };
 
+// const updatePatient = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const patient = await Patient.findById(id);
+//     if (!patient) {
+//       return res.status(404).json({ message: "Patient not found" });
+//     }
+
+//     // Validate dữ liệu từ client
+//     const { error } = validatePatient(req.body);
+//     if (error) {
+//       return res.status(400).json({ message: error.details[0].message });
+//     }
+
+//     const patientUpdate = await Patient.findByIdAndUpdate(id, req.body);
+//     const hashedPassword = await bcrypt.hash(req.body.password, 10);
+//     await User.findByIdAndUpdate(
+//       { _id: patient.user_id },
+//       {
+//         name: req.body.name,
+//         email: req.body.email,
+//         password: hashedPassword,
+//         phone: req.body.phone,
+//       }
+//     );
+//     return res.status(200).json(patientUpdate);
+//   } catch (error) {
+//     return res.status(500).json({ message: error.message });
+//   }
+// };
+
 const updatePatient = async (req, res) => {
   try {
     const { id } = req.params;
@@ -98,19 +129,36 @@ const updatePatient = async (req, res) => {
       return res.status(400).json({ message: error.details[0].message });
     }
 
-    const patientUpdate = await Patient.findByIdAndUpdate(id, req.body);
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    await User.findByIdAndUpdate(
-      { _id: patient.user_id },
-      {
-        name: req.body.name,
-        email: req.body.email,
-        password: hashedPassword,
-        phone: req.body.phone,
-      }
-    );
+    // Cập nhật thông tin bệnh nhân
+    const patientUpdate = await Patient.findByIdAndUpdate(id, req.body, { new: true });
+
+    // Chỉ băm mật khẩu nếu nó được cung cấp
+    if (req.body.password) {
+      const hashedPassword = await bcrypt.hash(req.body.password, 10);
+      await User.findByIdAndUpdate(
+        { _id: patient.user_id },
+        {
+          name: req.body.name,
+          email: req.body.email,
+          password: hashedPassword,
+          phone: req.body.phone,
+        }
+      );
+    } else {
+      // Nếu không có mật khẩu mới, chỉ cập nhật các trường khác
+      await User.findByIdAndUpdate(
+        { _id: patient.user_id },
+        {
+          name: req.body.name,
+          email: req.body.email,
+          phone: req.body.phone,
+        }
+      );
+    }
+
     return res.status(200).json(patientUpdate);
   } catch (error) {
+    console.error(error); // Ghi lại lỗi
     return res.status(500).json({ message: error.message });
   }
 };

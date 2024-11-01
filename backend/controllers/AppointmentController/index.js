@@ -152,7 +152,7 @@ const patientCreateAppointment = async (req, res) => {
     const patient = await Patient.findOne({ user_id: req.user.id });
     const appointment = await Appointment.create({
       ...req.body,
-      patient_id: patient.id,
+      patient_id: patient._id,
     });
     await Appointment_history.create({
       status: appointment.status,
