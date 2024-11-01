@@ -10,6 +10,7 @@ import cross_icon from './cross_icon.png'
 import chats_icon from './chats_icon.svg'
 import verified_icon from './verified_icon.svg'
 import arrow_icon from './arrow_icon.svg'
+import notification_icon from './notification_icon.svg'
 import info_icon from './info_icon.svg'
 import upload_icon from './upload_icon.png'
 import stripe_logo from './stripe_logo.png'
@@ -49,6 +50,7 @@ export const assets = {
     about_image,
     menu_icon,
     cross_icon,
+    notification_icon,
     dropdown_icon,
     upload_icon,
     stripe_logo,
