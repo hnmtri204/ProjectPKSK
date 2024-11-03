@@ -6,13 +6,16 @@ export const AppContext = createContext();
 const AppContextProvider = (props) => {
     const [doctors, setDoctors] = useState([]);
     const [user, setUser] = useState(null); 
+    const [patient, setPatient] = useState(null);
     const currencySymbol = '$';
 
     const value = {
         doctors,
         setDoctors,
         user, 
-        setUser, 
+        setUser,
+        patient,  
+        setPatient,  
         currencySymbol
     };
 

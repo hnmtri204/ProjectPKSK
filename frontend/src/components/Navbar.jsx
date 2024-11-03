@@ -68,19 +68,19 @@ const Navbar = () => {
                                 <p onClick={handleLogout} className='hover:text-black cursor-pointer'>Đăng xuất</p>
                             </div>
                         </div>
-                        {/* Biểu tượng chuông thông báo */}
-                        <img
-                            onClick={() => navigate('/Notifications')}
-                            className='w-6 cursor-pointer'
-                            src={assets.notification_icon}
-                            alt="Thông báo"
-                        />
                     </div>
                 ) : (
                     <NavLink to='/login'>
                         <button onClick={() => navigate('/login')} className='bg-primary text-white px-8 py-3 rounded-full font-light hidden md:block'>Tạo tài khoản</button>
                     </NavLink>
                 )}
+                {/* Biểu tượng chuông thông báo */}
+                <img
+                    onClick={() => navigate('/Notifications')}
+                    className='w-6 cursor-pointer'
+                    src={assets.notification_icon}
+                    alt="Thông báo"
+                />
                 <img onClick={() => setShowMenu(true)} className='w-6 md:hidden' src={assets.menu_icon} alt="" />
                 {/* ----- Mobile Menu ----- */}
                 <div className={`${showMenu ? 'fixed w-full' : 'h-0 w-0'} md:hidden right-0 top-0 bottom-0 z-20 overflow-hidden bg-white transition-all`}>

@@ -2,6 +2,7 @@ const Specialization = require("../../models/Specialization");
 const Notification = require("../../models/Notification");
 const Doctor = require("../../models/Doctor");
 const validateNotification = require("../../requests/validateNotification");
+const Patient = require("../../models/Patient");
 
 const createNotification = async (req, res) => {
   try {
@@ -46,7 +47,6 @@ const findNotification = async (req, res) => {
   }
 };
 
-
 const updateNotification = async (req, res) => {
   try {
     // Validate dữ liệu từ client
@@ -55,7 +55,7 @@ const updateNotification = async (req, res) => {
       return res.status(400).json({ message: error.details[0].message });
     }
 
-    const {id} = req.params;
+    const { id } = req.params;
     const notification = await Notification.findByIdAndUpdate(id, req.body);
     if (!notification) {
       return res.status(400).json({ message: "Notification not found" });
@@ -65,7 +65,7 @@ const updateNotification = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
-}
+};
 
 const deleteNotification = async (req, res) => {
   try {
@@ -81,4 +81,48 @@ const deleteNotification = async (req, res) => {
   }
 };
 
-module.exports = { createNotification, findAllNotification, findNotification, updateNotification, deleteNotification };
+const getCurrentUserNotifications = async (req, res) => {
+  try {
+    const user_id = req.user?.id;
+    const user_role = req.user?.role;
+
+    let notifications;
+
+    if (!user_id) {
+      return res.status(401).json({ message: "User not authenticated" });
+    }
+    if (user_role === "patient") {
+      const patient = await Patient.findOne({ user_id: user_id });
+      if (!patient) {
+        return res.status(400).json({ message: "Patient not found" });
+      }
+
+      notifications = await Notification.find({ patient_id: patient._id });
+      if (notifications.length > 0) {
+        return res.status(200).json(notifications);
+      }
+    } else if (user_role === "doctor") {
+      const doctor = await Doctor.findOne({ user_id: user_id });
+      if (!doctor) {
+        return res.status(400).json({ message: "Doctor not found" });
+      }
+
+      notifications = await Notification.find({ doctor_id: doctor._id });
+      if (notifications.length > 0) {
+        return res.status(200).json(notifications);
+      }
+    }
+    return res.status(404).json({ message: "Notifications not found" });
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = {
+  createNotification,
+  findAllNotification,
+  findNotification,
+  updateNotification,
+  deleteNotification,
+};

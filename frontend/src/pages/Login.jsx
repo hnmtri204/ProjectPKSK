@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AppContext } from '../context/AppContext'; 
+import { AppContext } from '../context/AppContext';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -24,7 +24,7 @@ const Login = () => {
         const requestBody = {
             email,
             password,
-            ...(state === 'Sign Up' && { name, phone })
+            ...(state === 'Sign Up' && { name, phone }), // Thêm name và phone cho người dùng đăng ký
         };
 
         try {
@@ -41,9 +41,13 @@ const Login = () => {
             if (response.ok) {
                 // Lưu người dùng vào context thay vì sessionStorage
                 setUser(data.user);
-                
+
                 // Bạn vẫn có thể lưu vào sessionStorage nếu muốn
                 sessionStorage.setItem('user', JSON.stringify(data.user));
+
+                // Kiểm tra dữ liệu đã được lưu vào sessionStorage hay chưa
+                const storedUser = sessionStorage.getItem('user');
+                console.log('Stored User:', storedUser); // In ra dữ liệu đã lưu
 
                 // Điều hướng dựa trên vai trò của người dùng
                 switch (data.user.role) {
@@ -124,6 +128,3 @@ const Login = () => {
 }
 
 export default Login;
-
-
-

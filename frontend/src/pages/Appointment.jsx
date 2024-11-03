@@ -141,12 +141,12 @@ import axios from 'axios';
 
 const Appointment = () => {
   const { docId } = useParams();
-  const { doctors, user } = useContext(AppContext); // Lấy thông tin người dùng từ context
+  const { doctors, user } = useContext(AppContext);
 
   const [docInfo, setDocInfo] = useState(null);
-  const [slotTime, setSlotTime] = useState('');
+  const [slotTime, setSlotTime] = useState(sessionStorage.getItem('slotTime') || '');
   const [doctorSchedule, setDoctorSchedule] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(sessionStorage.getItem('selectedDate') || null);
   const [error, setError] = useState('');
 
   const fetchDocInfo = () => {
@@ -170,19 +170,19 @@ const Appointment = () => {
     }
 
     const appointmentData = {
-      patient_id: user.id,
+      patient_id: user._id,
       doctor_id: docId,
       work_shift: slotTime,
-      work_date: selectedDate, // Sử dụng selectedDate dưới dạng Date
+      work_date: selectedDate,
       status: 'pending',
     };
-    console.log(appointmentData);
 
     try {
       await axios.post('http://localhost:5000/appointment/create', appointmentData);
       alert('Đặt lịch hẹn thành công!');
     } catch (error) {
       console.error('Error creating appointment:', error);
+      setError('Không thể tạo lịch hẹn. Vui lòng thử lại.');
     }
   };
 
@@ -196,11 +196,23 @@ const Appointment = () => {
     }
   }, [docInfo]);
 
+  // Lưu selectedDate và slotTime vào sessionStorage khi chúng thay đổi
+  useEffect(() => {
+    if (selectedDate) {
+      sessionStorage.setItem('selectedDate', selectedDate);
+    }
+  }, [selectedDate]);
+
+  useEffect(() => {
+    if (slotTime) {
+      sessionStorage.setItem('slotTime', slotTime);
+    }
+  }, [slotTime]);
+
   return (
     docInfo && (
       <div>
-        {error && <p className="text-red-500">{error}</p>} {/* Hiển thị lỗi nếu có */}
-        {/* ----- Doctor Details ----- */}
+        {error && <p className="text-red-500">{error}</p>}
         <div className='flex flex-col sm:flex-row gap-4'>
           <div>
             <img className='bg-primary w-full sm:max-w-72 rounded-lg' src={docInfo.user_id.image} alt="" />
@@ -222,7 +234,6 @@ const Appointment = () => {
           </div>
         </div>
 
-        {/* ----- Booking slots ----- */}
         <div className='sm:ml-72 sm:pl-4 mt-4 font-medium text-gray-700'>
           <p>Đặt chỗ</p>
           <div className='flex gap-3 items-center w-full overflow-x-scroll mt-4'>
@@ -234,7 +245,7 @@ const Appointment = () => {
                 <div
                   key={schedule._id}
                   className={`text-center py-6 min-w-16 rounded-full border cursor-pointer ${selectedDate === schedule.work_date ? 'bg-[#00759c] text-white' : 'border-gray-200'}`}
-                  onClick={() => setSelectedDate(schedule.work_date)} // Đặt selectedDate thành ngày thay vì id
+                  onClick={() => setSelectedDate(schedule.work_date)}
                 >
                   <p className={`text-gray-600 ${selectedDate === schedule.work_date ? 'text-white' : 'text-gray-600'}`}>
                     {dayOfWeek}
@@ -269,11 +280,12 @@ const Appointment = () => {
           </button>
         </div>
 
-        {/* ----- Listing Related Doctors ----- */}
         <RelatedDoctors docId={docId} speciality={docInfo.specialization_id.name} />
       </div>
     )
   );
-}
+};
 
 export default Appointment;
+
+

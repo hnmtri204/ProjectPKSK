@@ -10,5 +10,15 @@ const createRole = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+const findAllRole = async (req, res) => {
+  try {
+    const roles = await Role.find({});
+    if (roles) {
+      res.status(200).json(roles);
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
-module.exports = { createRole };
+module.exports = { createRole, findAllRole };

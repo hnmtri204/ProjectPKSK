@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const cloudinary = require ( 'cloudinary' ). v2 ; 
 const upload = require ( './helpers/multer-config' ); 
 const session = require('express-session');
+const cors = require('cors');
 
 const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
 const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
@@ -20,9 +21,15 @@ const userRouterAppointment = require("./routers/Appointment");
 const userRouterSchedule = require("./routers/Schedule");
 const userRouterHome = require("./routers/Home");
 
+<<<<<<< HEAD
 const cors = require('cors');
 
+=======
+//middleware
+>>>>>>> f315e4ec09de88cbdf4efcd81cbedbf6c7d61f39
 const app = express();
+app.use(cors());
+app.use(express.json());
 
 app.use(cors());
 
@@ -43,7 +50,7 @@ app.use(session({
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false }
+  cookie: { secure: true }
 }));
 
 
