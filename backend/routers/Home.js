@@ -28,9 +28,8 @@ router.post("/updateProfilePatient", userMiddleware, updateProfilePatient);
 router.get("/user-appointment", userMiddleware, getCurrentUserAppointments);
 router.delete("/cancel-appointment/:id", processPrematureCancellation);
 router.get("/show-upcoming-appointments", userMiddleware, showUpcomingAppointments);
-router.get("/show-upcoming-appointments", userMiddleware, showUpcomingAppointments);
 router.get("/get-appointments-status", userMiddleware, getAppointmentByStatus);
-router.get("/get-appointments-doctor/:id", getScheduleByDoctor);
+router.get("/get-schedule-doctor/:id", getScheduleByDoctor);
 router.get("/filter/:id", filter);
 
 module.exports = router;

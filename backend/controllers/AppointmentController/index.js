@@ -62,6 +62,11 @@ const findAppointment = async (req, res) => {
 
 const updateAppointment = async (req, res) => {
   try {
+    const user_id = req.user.id;
+    if (!user_id) {
+      return res.status(401).json({ message: "User not authenticated" });
+    }
+
     // Validate dữ liệu từ client
     const { error } = validateAppointment(req.body);
     if (error) {
@@ -89,7 +94,10 @@ const updateAppointment = async (req, res) => {
       { new: true }
     );
 
+    
+
     await Notification.create({
+      user_id: user_id,
       content: `Your appointment has been changed.`,
       new_date: appointment.work_date,
       new_work_shift: appointment.work_shift,
@@ -97,9 +105,21 @@ const updateAppointment = async (req, res) => {
 
     // Gửi email cho bệnh nhân
     const patient = await Patient.findById(appointment.patient_id);
+    if (!patient) {
+      return res.status(404).json({ message: "Patient not found" });
+    }
     const doctor = await Doctor.findById(appointment.doctor_id);
+    if (!doctor) {
+      return res.status(404).json({ message: "Doctor not found" });
+    }
     const patientInfo = await User.findOne({ _id: patient.user_id });
+    if (!patientInfo) {
+      return res.status(404).json({ message: "Information of patient not found" });
+    }
     const doctorInfo = await User.findOne({ _id: doctor.user_id });
+    if (!doctorInfo) {
+      return res.status(404).json({ message: "Information of doctor not found" });
+    }
 
     const vietnamTime = moment(appointment.work_date)
       .tz("Asia/Ho_Chi_Minh")

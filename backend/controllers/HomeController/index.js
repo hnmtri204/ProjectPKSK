@@ -1,9 +1,57 @@
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const User = require("../../models/User");
 const RoleUser = require("../../models/User_role"); // Import model RoleUser
 const Role = require("../../models/Role"); // Import model Role
 const validateUser = require("../../requests/validateUser");
 const Schedule = require("../../models/Schedule");
+JWT_SECRET = process.env.JWT_SECRET;
+
+// const login = async (req, res) => {
+//   try {
+//     // Validate dữ liệu từ client
+//     const { error } = validateUser(req.body);
+//     if (error) {
+//       return res.status(400).json({ message: error.details[0].message });
+//     }
+
+//     const user = await User.findOne({ email: req.body.email });
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found!" });
+//     }
+
+//     // console.log(user);
+
+//     // So sánh mật khẩu
+//     const isMatch = await bcrypt.compare(req.body.password, user.password);
+//     if (!isMatch) {
+//       return res.status(400).json({ message: "Invalid password!" });
+//     }
+
+//     // Lấy danh sách role của người dùng
+//     const roleUsers = await RoleUser.find({ user_id: user._id }).populate('role_id');
+//     // console.log(roleUsers);
+
+//     // Lấy role đầu tiên (nếu có)
+//     const userRole = roleUsers.length > 0 ? roleUsers[0].role_id.name : null;
+
+//     // Lưu thông tin người dùng vào session
+//     req.session.user = {
+//       id: user._id,
+//       name: user.name,
+//       email: user.email,
+//       phone: user.phone,
+//       role: userRole,
+//     };
+
+//     return res.status(200).json({
+//       message: "Login successful!",
+//       user: req.session.user,
+//     });
+//   } catch (error) {
+//     return res.status(500).json({ message: error.message });
+//   }
+// };
 
 const login = async (req, res) => {
   try {
@@ -18,8 +66,6 @@ const login = async (req, res) => {
       return res.status(404).json({ message: "User not found!" });
     }
 
-    // console.log(user);
-
     // So sánh mật khẩu
     const isMatch = await bcrypt.compare(req.body.password, user.password);
     if (!isMatch) {
@@ -27,35 +73,37 @@ const login = async (req, res) => {
     }
 
     // Lấy danh sách role của người dùng
-    const roleUsers = await RoleUser.find({ user_id: user._id }).populate('role_id');
-    // console.log(roleUsers);
-
-    // Lấy role đầu tiên (nếu có)
+    const roleUsers = await RoleUser.find({ user_id: user._id }).populate(
+      "role_id"
+    );
     const userRole = roleUsers.length > 0 ? roleUsers[0].role_id.name : null;
 
-    // Lưu thông tin người dùng vào session
-    req.session.user = {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      phone: user.phone,
-      password: user.password,
-      role: userRole,
-    };
+    // Tạo token JWT
+    const token = jwt.sign({ id: user._id, role: userRole }, JWT_SECRET, {
+      expiresIn: "1h",
+    });
 
     return res.status(200).json({
       message: "Login successful!",
-      user: req.session.user,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: userRole,
+        token: token,
+      },
     });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error." });
   }
 };
 
 const logout = async (req, res) => {
   try {
     // Xóa thông tin người dùng trong session
-    req.session.destroy(err => {
+    req.session.destroy((err) => {
       if (err) {
         return res.status(500).json({ message: "Could not log out." });
       }
@@ -74,17 +122,17 @@ const filter = async (req, res) => {
 
     // Xác định khoảng thời gian dựa trên filterType
     switch (filterType) {
-      case 'today':
+      case "today":
         startDate = new Date(now.setHours(0, 0, 0, 0)); // Bắt đầu từ đầu ngày
         endDate = new Date(now.setHours(23, 59, 59, 999)); // Kết thúc vào cuối ngày
         break;
-      case 'week':
+      case "week":
         const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay())); // Bắt đầu tuần
         startDate = new Date(startOfWeek.setHours(0, 0, 0, 0));
         endDate = new Date(startOfWeek.setDate(startOfWeek.getDate() + 6)); // Kết thúc tuần
         endDate = new Date(endDate.setHours(23, 59, 59, 999));
         break;
-      case 'month':
+      case "month":
         startDate = new Date(now.getFullYear(), now.getMonth(), 1); // Bắt đầu tháng
         endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0); // Kết thúc tháng
         endDate = new Date(endDate.setHours(23, 59, 59, 999));
@@ -95,7 +143,7 @@ const filter = async (req, res) => {
 
     // Tạo điều kiện truy vấn
     const query = {
-      work_date: { $gte: startDate, $lte: endDate } // Lọc theo thời gian
+      work_date: { $gte: startDate, $lte: endDate }, // Lọc theo thời gian
     };
 
     // Nếu có chuyên khoa, thêm điều kiện vào truy vấn

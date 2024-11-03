@@ -137,29 +137,27 @@ const deletePatient = async (req, res) => {
 
 const profilePatient = async (req, res) => {
   try {
-    // Kiểm tra xem người dùng đã đăng nhập chưa
-    if (!req.session.user) {
-      return res.status(401).json({ message: "User not authenticated" });
+    const user_id = req.user.id; // Lấy ID người dùng từ token
+    const userInfo  = await User.findById(user_id);
+
+
+    // Kiểm tra xem userInfo có tồn tại không
+    if (!userInfo) {
+      return res.status(404).json({ message: "User not found" });
     }
-    const user_id = req.user.id;
-    // Lấy tất cả thông tin từ session
-    const userInfo = req.session.user;
 
     return res.status(200).json({
       message: "User information retrieved successfully",
-      user: userInfo,
+      user: userInfo, // Trả về thông tin người dùng
     });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };
 
+
 const updateProfilePatient = async (req, res) => {
   try {
-    // Kiểm tra xem người dùng đã đăng nhập chưa
-    if (!req.session.user) {
-      return res.status(401).json({ message: "User not authenticated" });
-    }
     // Lấy tất cả thông tin từ session
     const user_id = req.user.id;
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
