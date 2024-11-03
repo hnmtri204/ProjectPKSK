@@ -79,10 +79,24 @@ const deleteSchedule = async (req, res) => {
   }
 };
 
+const getScheduleByDoctor = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const schedules = await Schedule.find({ doctor_id: id });
+    if (schedules.length <= 0) {
+      return res.status(400).json({ message: "Schedule not found" });
+    }
+    return res.status(200).json(schedules);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createSchedule,
   findAllSchedule,
   findSchedule,
   updateSchedule,
   deleteSchedule,
+  getScheduleByDoctor
 };

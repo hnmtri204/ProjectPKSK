@@ -2,8 +2,9 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cloudinary = require ( 'cloudinary' ). v2 ; 
-const upload = require ( './multer-config' ); 
+const upload = require ( './helpers/multer-config' ); 
 const session = require('express-session');
+const cors = require('cors');
 
 const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
 const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
@@ -20,8 +21,10 @@ const userRouterAppointment = require("./routers/Appointment");
 const userRouterSchedule = require("./routers/Schedule");
 const userRouterHome = require("./routers/Home");
 
-
+//middleware
 const app = express();
+app.use(cors());
+app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;

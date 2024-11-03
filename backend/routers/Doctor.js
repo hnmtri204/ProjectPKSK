@@ -26,7 +26,7 @@ const {
   deleteDoctor,
   confirmAppointment
 } = require("../controllers/DoctorController/index");
-const upload = require('../multer-config'); // Import multer config
+const upload = require('../helpers/multer-config'); // Import multer config
 
 // Định nghĩa route
 router.post("/create", upload.single('image'), createDoctor);

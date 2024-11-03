@@ -11,6 +11,15 @@ const NotificationSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    new_date: {
+      type: Date,
+      required: false,
+    },
+    new_work_shift: {
+      type: String,
+      enum: ['morning', 'afternoon'],
+      required: false,
+    },
   },
   {
     timestamps: true,

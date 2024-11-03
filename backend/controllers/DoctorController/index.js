@@ -72,7 +72,6 @@ const createDoctor = async (req, res) => {
 
     let imageUrl = null;
     if (req.file) {
-      console.log("ton tai anh");
       // Chuyển đổi buffer của file thành chuỗi Base64 để upload
       const base64Image = `data:${
         req.file.mimetype
@@ -267,7 +266,7 @@ const confirmAppointment = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    if (status === "confirmed" || status === "canceled") {
+    if (status === "confirmed" || status === "canceled" || status === "finished") {
       const updatedAppointment = await Appointment.findByIdAndUpdate(
         id,
         { status }

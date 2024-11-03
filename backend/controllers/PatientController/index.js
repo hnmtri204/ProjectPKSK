@@ -1,9 +1,9 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 const Role = require("../../models/Role");
 const User = require("../../models/User");
 const UserRole = require("../../models/User_role");
 const Doctor = require("../../models/Patient");
-const validatePatient = require('../../requests/validatePatient');
+const validatePatient = require("../../requests/validatePatient");
 const Patient = require("../../models/Patient");
 
 //{ key: value } là một đtuong trong js, thường dùng để crud
@@ -17,19 +17,19 @@ từ đối tượng hoặc mảng và gán chúng vào các biến riêng biệ
  */
 const createPatient = async (req, res) => {
   try {
-     // Validate dữ liệu từ client
-     const { error } = validatePatient(req.body);
-     if (error) {
-       return res.status(400).json({ message: error.details[0].message });
-     }
+    // Validate dữ liệu từ client
+    const { error } = validatePatient(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
 
-     // Băm mật khẩu
-     const hashedPassword = await bcrypt.hash(req.body.password, 10); // 10 là số vòng băm
+    // Băm mật khẩu
+    const hashedPassword = await bcrypt.hash(req.body.password, 10); // 10 là số vòng băm
 
-     const patient = await User.create({
-       ...req.body,
-       password: hashedPassword,
-     });
+    const patient = await User.create({
+      ...req.body,
+      password: hashedPassword,
+    });
 
     // Kiểm tra xem người dùng có được tạo thành công không
     if (patient) {
@@ -58,8 +58,7 @@ const createPatient = async (req, res) => {
 
 const findAllPatient = async (req, res) => {
   try {
-    const patient = await Patient.find({})
-      .populate("user_id");
+    const patient = await Patient.find({}).populate("user_id");
 
     if (patient) {
       return res.status(200).json(patient);
@@ -74,8 +73,7 @@ const findAllPatient = async (req, res) => {
 const findPatient = async (req, res) => {
   try {
     const { id } = req.params;
-    const patient = await Patient.findById(id)
-      .populate("user_id");
+    const patient = await Patient.findById(id).populate("user_id");
     if (patient) {
       return res.status(200).json(patient);
     } else {
@@ -94,11 +92,11 @@ const updatePatient = async (req, res) => {
       return res.status(404).json({ message: "Patient not found" });
     }
 
-     // Validate dữ liệu từ client
-     const { error } = validatePatient(req.body);
-     if (error) {
-       return res.status(400).json({ message: error.details[0].message });
-     }
+    // Validate dữ liệu từ client
+    const { error } = validatePatient(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
 
     const patientUpdate = await Patient.findByIdAndUpdate(id, req.body);
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
@@ -108,7 +106,7 @@ const updatePatient = async (req, res) => {
         name: req.body.name,
         email: req.body.email,
         password: hashedPassword,
-        phone: req.body.phone,  
+        phone: req.body.phone,
       }
     );
     return res.status(200).json(patientUpdate);
@@ -137,10 +135,60 @@ const deletePatient = async (req, res) => {
   }
 };
 
+const profilePatient = async (req, res) => {
+  try {
+    const user_id = req.user.id; // Lấy ID người dùng từ token
+    const userInfo  = await User.findById(user_id);
+
+
+    // Kiểm tra xem userInfo có tồn tại không
+    if (!userInfo) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      message: "User information retrieved successfully",
+      user: userInfo, // Trả về thông tin người dùng
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+
+const updateProfilePatient = async (req, res) => {
+  try {
+    // Lấy tất cả thông tin từ session
+    const user_id = req.user.id;
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const user = await User.findByIdAndUpdate(user_id, {
+      name: req.body.name,
+      email: req.body.email,
+      phone: req.body.phone,
+      password: hashedPassword,
+    });
+    const userUpdate = await User.findById(user_id);
+    if (user) {
+
+      return res.status(200).json({ userUpdate });
+    }
+
+    return res.status(400).json({
+      message: "User not found!",
+    });
+
+  } catch (error) {
+
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createPatient,
   findAllPatient,
   findPatient,
   updatePatient,
   deletePatient,
+  profilePatient,
+  updateProfilePatient,
 };
