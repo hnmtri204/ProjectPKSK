@@ -39,19 +39,19 @@ const Navbar = () => {
             <ul className='hidden md:flex items-start gap-5 font-medium'>
                 <NavLink to='/'>
                     <li className='py-1'>Trang chủ</li>
-                    <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
+                    <hr className='border-none outline-none h-0.5 bg-[#00759c] w-3/5 m-auto hidden' />
                 </NavLink>
                 <NavLink to='/doctors'>
                     <li className='py-1'>Tất cả bác sĩ</li>
-                    <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
+                    <hr className='border-none outline-none h-0.5 bg-[#00759c] w-3/5 m-auto hidden' />
                 </NavLink>
                 <NavLink to='about'>
                     <li className='py-1'>Về chúng tôi</li>
-                    <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
+                    <hr className='border-none outline-none h-0.5 bg-[#00759c] w-3/5 m-auto hidden' />
                 </NavLink>
                 <NavLink to='contact'>
                     <li className='py-1'>Liên hệ</li>
-                    <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
+                    <hr className='border-none outline-none h-0.5 bg-[#00759c] w-3/5 m-auto hidden' />
                 </NavLink>
             </ul>
 
@@ -65,13 +65,14 @@ const Navbar = () => {
                             <div className='min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4'>
                                 <p onClick={() => navigate('my-profile')} className='hover:text-black cursor-pointer'>Hồ sơ của tôi</p>
                                 <p onClick={() => navigate('my-appointments')} className='hover:text-black cursor-pointer'>Lịch hẹn của tôi</p>
+                                <p onClick={() => navigate('medical-history')} className='hover:text-black cursor-pointer'>Lịch sử khám bệnh</p>
                                 <p onClick={handleLogout} className='hover:text-black cursor-pointer'>Đăng xuất</p>
                             </div>
                         </div>
                     </div>
                 ) : (
                     <NavLink to='/login'>
-                        <button onClick={() => navigate('/login')} className='bg-primary text-white px-8 py-3 rounded-full font-light hidden md:block'>Tạo tài khoản</button>
+                        <button onClick={() => navigate('/login')} className='bg-[#00759c] text-white px-8 py-3 rounded-full font-light hidden md:block'>Tạo tài khoản</button>
                     </NavLink>
                 )}
                 {/* Biểu tượng chuông thông báo */}

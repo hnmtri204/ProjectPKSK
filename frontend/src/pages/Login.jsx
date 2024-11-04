@@ -3,6 +3,10 @@ import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 
+// Nhập các SVG trực tiếp
+import EyeIcon from "../assets/eye.svg";
+import EyeOffIcon from "../assets/eye_off.svg";
+
 const Login = () => {
   const navigate = useNavigate();
   const { setUser } = useContext(AppContext);
@@ -20,9 +24,7 @@ const Login = () => {
     setLoading(true);
 
     const url =
-      state === "Sign Up"
-        ? "http://localhost:5000/patient/create"
-        : "http://localhost:5000/login";
+      state === "Sign Up" ? "http://localhost:5000/patient/create" : "http://localhost:5000/login";
 
     const requestBody = {
       email,
@@ -42,13 +44,9 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Lưu người dùng vào context
         setUser(data.user);
-
-        // Lưu token vào localStorage
         localStorage.setItem("token", data.user.token);
 
-        // Điều hướng dựa trên vai trò của người dùng
         switch (data.user.role) {
           case "user":
             navigate("/");
@@ -89,67 +87,37 @@ const Login = () => {
           <>
             <div className="w-full">
               <p>Tên đầy đủ</p>
-              <input
-                className="border border-zinc-300 rounded w-full p-2 mt-1"
-                type="text"
-                onChange={(e) => setName(e.target.value)}
-                value={name}
-                required
-              />
+              <input className="border border-zinc-300 rounded w-full p-2 mt-1" type="text" onChange={(e) => setName(e.target.value)} value={name} required />
             </div>
             <div className="w-full">
               <p>Số điện thoại</p>
-              <input
-                className="border border-zinc-300 rounded w-full p-2 mt-1"
-                type="tel"
-                onChange={(e) => setPhone(e.target.value)}
-                value={phone}
-                required
-              />
+              <input className="border border-zinc-300 rounded w-full p-2 mt-1" type="tel" onChange={(e) => setPhone(e.target.value)} value={phone} required />
             </div>
           </>
         )}
 
         <div className="w-full">
           <p>Email</p>
-          <input
-            className="border border-zinc-300 rounded w-full p-2 mt-1"
-            type="email"
-            onChange={(e) => setEmail(e.target.value)}
-            value={email}
-            required
-          />
+          <input className="border border-zinc-300 rounded w-full p-2 mt-1" type="email" onChange={(e) => setEmail(e.target.value)} value={email} required />
         </div>
 
         <div className="w-full relative">
           <p>Mật khẩu</p>
-          <input
-            className="border border-zinc-300 rounded w-full p-2 mt-1"
-            type={showPassword ? "text" : "password"}
-            onChange={(e) => setPassword(e.target.value)}
-            value={password}
-            required
-          />
+          <input className="border border-zinc-300 rounded w-full p-2 mt-1" type={showPassword ? "text" : "password"} onChange={(e) => setPassword(e.target.value)} value={password} required />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-sm"
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-transparent border-none cursor-pointer"
           >
-            {showPassword ? "Ẩn" : "Hiện"}
+            <img src={showPassword ? EyeIcon : EyeOffIcon} alt="Chuyển đổi hiển thị mật khẩu" className="w-5 h-5 mt-5" />
           </button>
         </div>
 
         <button
-          className={`bg-primary text-white w-full py-2 rounded-md text-base ${
-            loading ? "opacity-50 cursor-not-allowed" : ""
-          }`}
+          className={`bg-primary text-white w-full py-2 rounded-md text-base ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
           disabled={loading}
         >
-          {loading
-            ? "Đang xử lý..."
-            : state === "Sign Up"
-            ? "Tạo tài khoản"
-            : "Đăng nhập"}
+          {loading ? "Đang xử lý..." : state === "Sign Up" ? "Tạo tài khoản" : "Đăng nhập"}
         </button>
 
         {state === "Sign Up" ? (

@@ -5,6 +5,8 @@ import { AppContext } from "../context/AppContext";
 import { assets } from "../assets/assets";
 import RelatedDoctors from "../components/RelatedDoctors";
 import axios from "axios";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Appointment = () => {
   const { docId } = useParams();
@@ -36,6 +38,7 @@ const Appointment = () => {
       setDoctorSchedule(groupedSchedule);
     } catch (error) {
       console.error("Error fetching doctor schedule:", error);
+      toast.error("Có lỗi xảy ra khi tải lịch bác sĩ. Vui lòng thử lại.");
     }
   };
 
@@ -55,50 +58,61 @@ const Appointment = () => {
 
   const handleBooking = async () => {
     if (slotTime) {
-      const confirmation = window.confirm(
-        "Bạn có chắc chắn muốn đặt lịch hẹn không?"
-      );
-      if (confirmation) {
-        try {
-          const patientId = user.id;
-          const token = user?.token || "";
-          const selectedSchedule = doctorSchedule[selectedDate].find(
-            (schedule) =>
-              (schedule.work_shift === "morning" && slotTime === "Buổi sáng") ||
-              (schedule.work_shift === "afternoon" && slotTime === "Buổi chiều")
-          );
-
-          if (selectedSchedule && patientId) {
-            const appointmentData = {
-              patient_id: patientId,
-              doctor_id: docId,
-              work_shift: selectedSchedule.work_shift,
-              work_date: selectedSchedule.work_date,
-            };
-
-            await axios.post("http://localhost:5000/create-appointment", appointmentData, {
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-            });
-            alert("Đặt lịch hẹn thành công!");            
-          } else {
-            alert("Không tìm thấy lịch hẹn hoặc thông tin bệnh nhân.");
-          }
-        } catch (error) {
-          console.error("Error creating appointment:", error);
-          alert("Có lỗi xảy ra khi đặt lịch hẹn. Vui lòng thử lại.");
-        }
-      }
+      // Hiển thị thông báo xác nhận
+      toast.info("Bạn có chắc chắn muốn đặt lịch hẹn không?", {
+        position: "top-center",
+        autoClose: false,
+        closeOnClick: false,
+        draggable: false,
+        progress: undefined,
+        onClose: () => {
+          // Nếu người dùng xác nhận
+          confirmBooking();
+        },
+      });
     } else {
-      alert("Vui lòng chọn ca làm việc trước khi đặt lịch hẹn.");
+      toast.warn("Vui lòng chọn ca làm việc trước khi đặt lịch hẹn.");
+    }
+  };
+
+  const confirmBooking = async () => {
+    try {
+      const patientId = user.id;
+      const token = user?.token || "";
+      const selectedSchedule = doctorSchedule[selectedDate].find(
+        (schedule) =>
+          (schedule.work_shift === "morning" && slotTime === "Buổi sáng") ||
+          (schedule.work_shift === "afternoon" && slotTime === "Buổi chiều")
+      );
+
+      if (selectedSchedule && patientId) {
+        const appointmentData = {
+          patient_id: patientId,
+          doctor_id: docId,
+          work_shift: selectedSchedule.work_shift,
+          work_date: selectedSchedule.work_date,
+        };
+
+        await axios.post("http://localhost:5000/create-appointment", appointmentData, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        toast.success("Đặt lịch hẹn thành công!");            
+      } else {
+        toast.error("Không tìm thấy lịch hẹn hoặc thông tin bệnh nhân.");
+      }
+    } catch (error) {
+      console.error("Error creating appointment:", error);
+      toast.error("Có lỗi xảy ra khi đặt lịch hẹn. Vui lòng thử lại.");
     }
   };
 
   return (
     docInfo && (
       <div>
+        <ToastContainer />
         {/* ----- Doctor Details ----- */}
         <div className="flex flex-col sm:flex-row gap-4">
           <div>

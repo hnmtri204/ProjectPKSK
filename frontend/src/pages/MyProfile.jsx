@@ -137,9 +137,9 @@ const MyProfile = () => {
                         <>
                             {newPassword && (
                                 <>
-                                    <p className='font-medium text-blue-600'>Mật khẩu cũ (nhập để xác nhận):</p>
+                                    <p className='font-medium'>Mật khẩu cũ:</p>
                                     <input
-                                        className='bg-gray-100 max-w-52 border border-blue-500'
+                                        className='bg-gray-100 max-w-52 border'
                                         type="password"
                                         value={oldPassword}
                                         onChange={e => setOldPassword(e.target.value)}

@@ -12,6 +12,8 @@ import verified_icon from './verified_icon.svg'
 import arrow_icon from './arrow_icon.svg'
 import notification_icon from './notification_icon.svg'
 import info_icon from './info_icon.svg'
+import EyeIcon from "./eye.svg";
+import EyeOffIcon from "./eye_off.svg";
 import upload_icon from './upload_icon.png'
 import stripe_logo from './stripe_logo.png'
 import razorpay_logo from './razorpay_logo.png'
@@ -54,7 +56,9 @@ export const assets = {
     dropdown_icon,
     upload_icon,
     stripe_logo,
-    razorpay_logo
+    razorpay_logo,
+    EyeIcon,
+    EyeOffIcon
 }
 
 export const specialityData = [
