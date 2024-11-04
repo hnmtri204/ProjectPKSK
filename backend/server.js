@@ -21,17 +21,10 @@ const userRouterAppointment = require("./routers/Appointment");
 const userRouterSchedule = require("./routers/Schedule");
 const userRouterHome = require("./routers/Home");
 
-<<<<<<< HEAD
-const cors = require('cors');
-
-=======
 //middleware
->>>>>>> f315e4ec09de88cbdf4efcd81cbedbf6c7d61f39
 const app = express();
 app.use(cors());
 app.use(express.json());
-
-app.use(cors());
 
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
@@ -50,7 +43,7 @@ app.use(session({
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: true }
+  cookie: { secure: false}
 }));
 
 
