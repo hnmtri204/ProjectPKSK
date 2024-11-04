@@ -1,16 +1,15 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
-const cloudinary = require ( 'cloudinary' ). v2 ; 
-const upload = require ( './helpers/multer-config' ); 
+const cloudinary = require('cloudinary').v2;
+const upload = require('./helpers/multer-config');
 const session = require('express-session');
-const cors = require('cors');
+const cors = require('cors'); // Giữ lại khai báo này
 
 const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
 const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
-const CLOUDINARY_API_SECRET  = process.env.CLOUDINARY_API_SECRET ;
-const SESSION_SECRET = process.env.SESSION_SECRET
-
+const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
+const SESSION_SECRET = process.env.SESSION_SECRET;
 
 const userRouterRole = require("./routers/Role");
 const userRouterDoctor = require("./routers/Doctor");
@@ -21,31 +20,30 @@ const userRouterAppointment = require("./routers/Appointment");
 const userRouterSchedule = require("./routers/Schedule");
 const userRouterHome = require("./routers/Home");
 
-<<<<<<< HEAD
-const cors = require('cors');
-
-=======
-//middleware
->>>>>>> f315e4ec09de88cbdf4efcd81cbedbf6c7d61f39
+// Middleware
 const app = express();
-app.use(cors());
-app.use(express.json());
 
-app.use(cors());
+// Cấu hình CORS
+const corsOptions = {
+  origin: 'http://localhost:5173', // Thay đổi thành miền của ứng dụng client của bạn
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Các phương thức cho phép
+  credentials: true, // Nếu bạn cần gửi cookie
+};
+
+// Sử dụng middleware CORS với các tùy chọn
+app.use(cors(corsOptions));
+app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
-// database connection
+// Database connection
 mongoose
   .connect(MONGO_URI)
   .then(() => console.log("Mongodb is connected."))
   .catch((e) => console.log(e));
 
-//data json
-app.use(express.json());
-
-//session
+// Session
 app.use(session({
   secret: SESSION_SECRET,
   resave: false,
@@ -53,8 +51,7 @@ app.use(session({
   cookie: { secure: true }
 }));
 
-
-//user route
+// User routes
 app.use("/role", userRouterRole);
 app.use("/doctor", userRouterDoctor);
 app.use("/patient", userRouterPatient);
@@ -64,8 +61,7 @@ app.use("/appointment", userRouterAppointment);
 app.use("/schedule", userRouterSchedule);
 app.use("/", userRouterHome);
 
-
-//route defauld
+// Route default
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
@@ -81,8 +77,8 @@ cloudinary.config({
 app.post('/upload', upload.single('image'), async (req, res) => {
   try {
     // Upload image to Cloudinary
-    const result = await cloudinary.uploader.upload(req.file.path , {
-       folder:'doctor'
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: 'doctor'
     });
 
     // Send the Cloudinary URL in the response
@@ -97,4 +93,3 @@ app.post('/upload', upload.single('image'), async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
-

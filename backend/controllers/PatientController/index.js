@@ -84,37 +84,6 @@ const findPatient = async (req, res) => {
   }
 };
 
-// const updatePatient = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const patient = await Patient.findById(id);
-//     if (!patient) {
-//       return res.status(404).json({ message: "Patient not found" });
-//     }
-
-//     // Validate dữ liệu từ client
-//     const { error } = validatePatient(req.body);
-//     if (error) {
-//       return res.status(400).json({ message: error.details[0].message });
-//     }
-
-//     const patientUpdate = await Patient.findByIdAndUpdate(id, req.body);
-//     const hashedPassword = await bcrypt.hash(req.body.password, 10);
-//     await User.findByIdAndUpdate(
-//       { _id: patient.user_id },
-//       {
-//         name: req.body.name,
-//         email: req.body.email,
-//         password: hashedPassword,
-//         phone: req.body.phone,
-//       }
-//     );
-//     return res.status(200).json(patientUpdate);
-//   } catch (error) {
-//     return res.status(500).json({ message: error.message });
-//   }
-// };
-
 const updatePatient = async (req, res) => {
   try {
     const { id } = req.params;
@@ -205,30 +174,44 @@ const profilePatient = async (req, res) => {
 };
 
 
+
 const updateProfilePatient = async (req, res) => {
   try {
-    // Lấy tất cả thông tin từ session
     const user_id = req.user.id;
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    const user = await User.findByIdAndUpdate(user_id, {
-      name: req.body.name,
-      email: req.body.email,
-      phone: req.body.phone,
-      password: hashedPassword,
-    });
-    const userUpdate = await User.findById(user_id);
-    if (user) {
 
-      return res.status(200).json({ userUpdate });
+    // Lấy các trường thông tin từ yêu cầu
+    const { oldPassword, newPassword, name, email, phone } = req.body;
+
+    // Tìm người dùng bằng ID
+    const user = await User.findById(user_id);
+
+    if (!user) {
+      return res.status(404).json({ message: "Người dùng không tồn tại!" });
     }
 
-    return res.status(400).json({
-      message: "User not found!",
-    });
+    // Kiểm tra xem người dùng có muốn thay đổi mật khẩu không
+    if (newPassword) {
+      // Nếu có mật khẩu mới, yêu cầu người dùng nhập mật khẩu cũ để xác minh
+      const isOldPasswordCorrect = await bcrypt.compare(oldPassword, user.password);
+      if (!isOldPasswordCorrect) {
+        return res.status(400).json({ message: "Mật khẩu cũ không chính xác!" });
+      }
+      // Mã hóa mật khẩu mới và cập nhật
+      user.password = await bcrypt.hash(newPassword, 10);
+    }
 
+    // Cập nhật các thông tin khác của người dùng (không liên quan đến mật khẩu)
+    user.name = name;
+    user.email = email;
+    user.phone = phone;
+
+    // Lưu các thay đổi
+    await user.save();
+
+    // Trả về phản hồi thành công
+    return res.status(200).json({ message: "Thông tin đã được cập nhật thành công!", user });
   } catch (error) {
-
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: "Đã xảy ra lỗi khi cập nhật: " + error.message });
   }
 };
 

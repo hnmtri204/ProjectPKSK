@@ -201,9 +201,6 @@ const getCurrentUserAppointments = async (req, res) => {
 
     let appointments;
 
-    if (!user_id) {
-      return res.status(401).json({ message: "User not authenticated" });
-    }
     if (user_role === "patient") {
       const patient = await Patient.findOne({ user_id: user_id });
       if (!patient) {
