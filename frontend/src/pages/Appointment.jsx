@@ -11,6 +11,9 @@ import 'react-toastify/dist/ReactToastify.css';
 const Appointment = () => {
   const { docId } = useParams();
   const { doctors, user } = useContext(AppContext);
+  if (!user) {
+    return <div className="text-center text-2xl mt-10 text-gray-500">Bạn phải đăng nhập</div>;
+  }
 
   const [docInfo, setDocInfo] = useState(null);
   const [slotTime, setSlotTime] = useState("");
@@ -144,7 +147,7 @@ const Appointment = () => {
 
         {/* ----- Booking slots ----- */}
         <div className="sm:ml-72 sm:pl-4 mt-4 font-medium text-gray-700">
-          <p>Đặt chỗ</p>
+          <p>Lịch làm việc của bác sĩ:</p>
           <div className="flex gap-3 items-center w-full overflow-x-scroll mt-4">
             {Object.keys(doctorSchedule).map((dateStr) => {
               const date = new Date(dateStr);

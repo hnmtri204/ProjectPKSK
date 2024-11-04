@@ -200,6 +200,7 @@ const getCurrentUserAppointments = async (req, res) => {
     const user_role = req.user?.role;
 
     let appointments;
+    const today = new Date(); // Ngày hiện tại
 
     if (user_role === "patient") {
       const patient = await Patient.findOne({ user_id: user_id });
@@ -207,7 +208,25 @@ const getCurrentUserAppointments = async (req, res) => {
         return res.status(400).json({ message: "Patient not found" });
       }
 
-      appointments = await Appointment.find({ patient_id: patient._id });
+      appointments = await Appointment.find({
+        patient_id: patient._id,
+        work_date: { $gte: today } // Lọc các cuộc hẹn từ ngày hiện tại trở đi
+      })
+        .populate({
+          path: "patient_id",
+          populate: {
+            path: "user_id",
+            select: "name",
+          },
+        })
+        .populate({
+          path: "doctor_id",
+          populate: {
+            path: "user_id",
+            select: "name",
+          },
+        });
+
       if (appointments.length > 0) {
         return res.status(200).json(appointments);
       }
@@ -217,7 +236,25 @@ const getCurrentUserAppointments = async (req, res) => {
         return res.status(400).json({ message: "Doctor not found" });
       }
 
-      appointments = await Appointment.find({ doctor_id: doctor._id });
+      appointments = await Appointment.find({
+        doctor_id: doctor._id,
+        work_date: { $gte: today } // Lọc các cuộc hẹn từ ngày hiện tại trở đi
+      })
+        .populate({
+          path: "patient_id",
+          populate: {
+            path: "user_id",
+            select: "name",
+          },
+        })
+        .populate({
+          path: "doctor_id",
+          populate: {
+            path: "user_id",
+            select: "name",
+          },
+        });
+
       if (appointments.length > 0) {
         return res.status(200).json(appointments);
       }
