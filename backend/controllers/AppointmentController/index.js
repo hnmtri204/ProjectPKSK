@@ -198,9 +198,9 @@ const getCurrentUserAppointments = async (req, res) => {
   try {
     const user_id = req.user?.id;
     const user_role = req.user?.role;
+    const today = new Date();
 
     let appointments;
-    const today = new Date(); // Ngày hiện tại
 
     if (user_role === "patient") {
       const patient = await Patient.findOne({ user_id: user_id });
@@ -210,7 +210,8 @@ const getCurrentUserAppointments = async (req, res) => {
 
       appointments = await Appointment.find({
         patient_id: patient._id,
-        work_date: { $gte: today } // Lọc các cuộc hẹn từ ngày hiện tại trở đi
+        work_date: { $gte: today },
+        status: { $nin: ["canceled"] }
       })
         .populate({
           path: "patient_id",
@@ -225,7 +226,8 @@ const getCurrentUserAppointments = async (req, res) => {
             path: "user_id",
             select: "name",
           },
-        });
+        })
+        .sort({ updatedAt: -1 }); // Sắp xếp theo updatedAt giảm dần
 
       if (appointments.length > 0) {
         return res.status(200).json(appointments);
@@ -238,7 +240,8 @@ const getCurrentUserAppointments = async (req, res) => {
 
       appointments = await Appointment.find({
         doctor_id: doctor._id,
-        work_date: { $gte: today } // Lọc các cuộc hẹn từ ngày hiện tại trở đi
+        work_date: { $gte: today },
+        status: { $nin: ["canceled"] }
       })
         .populate({
           path: "patient_id",
@@ -253,7 +256,8 @@ const getCurrentUserAppointments = async (req, res) => {
             path: "user_id",
             select: "name",
           },
-        });
+        })
+        .sort({ updatedAt: -1 }); // Sắp xếp theo updatedAt giảm dần
 
       if (appointments.length > 0) {
         return res.status(200).json(appointments);

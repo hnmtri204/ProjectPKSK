@@ -82,7 +82,12 @@ const deleteSchedule = async (req, res) => {
 const getScheduleByDoctor = async (req, res) => {
   try {
     const { id } = req.params;
-    const schedules = await Schedule.find({ doctor_id: id });
+    const today = new Date();
+
+    const schedules = await Schedule.find({
+      doctor_id: id,
+      work_date: { $gte: today },
+    }).sort({ work_date: 1 });
     if (schedules.length <= 0) {
       return res.status(400).json({ message: "Schedule not found" });
     }
