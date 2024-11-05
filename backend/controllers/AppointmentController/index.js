@@ -94,10 +94,9 @@ const updateAppointment = async (req, res) => {
       { new: true }
     );
 
-    
-
     await Notification.create({
-      user_id: user_id,
+      patient_id: appointment.patient_id,
+      doctor_id: appointment.doctor_id,
       content: `Your appointment has been changed.`,
       new_date: appointment.work_date,
       new_work_shift: appointment.work_shift,
@@ -185,6 +184,13 @@ const patientCreateAppointment = async (req, res) => {
       patient_id: appointment.patient_id,
       doctor_id: appointment.doctor_id,
     });
+     await Notification.create({
+      patient_id: appointment.patient_id,
+      doctor_id: appointment.doctor_id,
+      content: `Bạn đã đặt lịch khám vào ngày: ${moment(appointment.work_date).format("DD/MM/YYYY")}`,
+      new_date: appointment.work_date,
+      new_work_shift: appointment.work_shift,
+    });
     if (appointment) {
       return res.status(200).json(appointment);
     }
@@ -224,7 +230,7 @@ const getCurrentUserAppointments = async (req, res) => {
           path: "doctor_id",
           populate: {
             path: "user_id",
-            select: "name",
+            select: "name image",
           },
         })
         .sort({ updatedAt: -1 }); // Sắp xếp theo updatedAt giảm dần
@@ -254,7 +260,7 @@ const getCurrentUserAppointments = async (req, res) => {
           path: "doctor_id",
           populate: {
             path: "user_id",
-            select: "name",
+            select: "name image",
           },
         })
         .sort({ updatedAt: -1 }); // Sắp xếp theo updatedAt giảm dần
@@ -308,9 +314,6 @@ const processPrematureCancellation = async (req, res) => {
 const showUpcomingAppointments = async (req, res) => {
   try {
     const user_id = req.user?.id;
-    if (!user_id) {
-      return res.status(401).json({ message: "User not authenticated" });
-    }
 
     const user_role = await User_role.findOne({ user_id: user_id });
     if (!user_role) {

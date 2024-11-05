@@ -85,19 +85,23 @@ const getCurrentUserNotifications = async (req, res) => {
   try {
     const user_id = req.user?.id;
     const user_role = req.user?.role;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to start of the day
 
     let notifications;
 
-    if (!user_id) {
-      return res.status(401).json({ message: "User not authenticated" });
-    }
     if (user_role === "patient") {
       const patient = await Patient.findOne({ user_id: user_id });
       if (!patient) {
         return res.status(400).json({ message: "Patient not found" });
       }
 
-      notifications = await Notification.find({ patient_id: patient._id });
+      notifications = await Notification.find({
+        patient_id: patient._id,
+        createdAt: { $gte: today },
+      })
+      .sort({ createdAt: -1 }); // Sort notifications from newest to oldest
+
       if (notifications.length > 0) {
         return res.status(200).json(notifications);
       }
@@ -107,7 +111,9 @@ const getCurrentUserNotifications = async (req, res) => {
         return res.status(400).json({ message: "Doctor not found" });
       }
 
-      notifications = await Notification.find({ doctor_id: doctor._id });
+      notifications = await Notification.find({ doctor_id: doctor._id })
+        .sort({ createdAt: -1 }); // Sort notifications from newest to oldest
+
       if (notifications.length > 0) {
         return res.status(200).json(notifications);
       }
@@ -119,10 +125,12 @@ const getCurrentUserNotifications = async (req, res) => {
   }
 };
 
+
 module.exports = {
   createNotification,
   findAllNotification,
   findNotification,
   updateNotification,
   deleteNotification,
+  getCurrentUserNotifications,
 };

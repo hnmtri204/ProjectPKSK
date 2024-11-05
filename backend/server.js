@@ -25,9 +25,9 @@ const app = express();
 
 // Cấu hình CORS
 const corsOptions = {
-  origin: 'http://localhost:5173', // Thay đổi thành miền của ứng dụng client của bạn
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Các phương thức cho phép
-  credentials: true, // Nếu bạn cần gửi cookie
+  origin: 'http://localhost:5173', 
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
 };
 
 // Sử dụng middleware CORS với các tùy chọn

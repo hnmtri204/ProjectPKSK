@@ -54,6 +54,13 @@ const MyAppointments = () => {
       return;
     }
 
+    // Show confirmation dialog
+    const confirmDelete = window.confirm("Bạn có chắc chắn muốn hủy cuộc hẹn này?");
+
+    if (!confirmDelete) {
+      return; // User canceled the action
+    }
+
     try {
       const response = await fetch(`http://localhost:5000/cancel-appointment/${appointmentId}`, {
         method: "DELETE",
@@ -84,6 +91,9 @@ const MyAppointments = () => {
             className="grid grid-cols-[1fr_2fr] gap-4 sm:flex sm:gap-6 py-2 border-b"
             key={appointment._id}
           >
+            <div>
+              <img className="w-32 bg-indigo-50" src={appointment.doctor_id.user_id.image} alt="Doctor" />
+            </div>
             <div className="flex-1 text-sm text-zinc-600">
               <p className="text-neutral-800 font-semibold">
                 Bệnh nhân: {appointment.patient_id.user_id.name}

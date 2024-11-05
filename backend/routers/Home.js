@@ -17,6 +17,7 @@ const userMiddleware = require("../middlewares/index");
 const {
   getScheduleByDoctor
 } = require("../controllers/ScheduleController/index");
+const { getCurrentUserNotifications } = require("../controllers/NotificationController/index");
 
 
 // Định nghĩa route
@@ -31,5 +32,6 @@ router.get("/show-upcoming-appointments", userMiddleware, showUpcomingAppointmen
 router.get("/get-appointments-status", userMiddleware, getAppointmentByStatus);
 router.get("/get-schedule-doctor/:id", getScheduleByDoctor);
 router.get("/filter/:id", filter);
+router.get("/notification", userMiddleware, getCurrentUserNotifications);
 
 module.exports = router;
