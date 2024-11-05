@@ -66,11 +66,10 @@ const MyAppointments = () => {
         throw new Error("Failed to cancel appointment");
       }
 
-      // Cập nhật lại danh sách lịch hẹn sau khi xóa
       setAppointments((prev) => prev.filter((appointment) => appointment._id !== appointmentId));
     } catch (error) {
       console.error("Error canceling appointment:", error);
-      setError("An error occurred while canceling the appointment.");
+      setError("Bạn chỉ huỷ cuộc hẹn trước 24h.");
     }
   };
 
@@ -83,7 +82,7 @@ const MyAppointments = () => {
         {appointments.map((appointment) => (
           <div
             className="grid grid-cols-[1fr_2fr] gap-4 sm:flex sm:gap-6 py-2 border-b"
-            key={appointment._id} // Sử dụng _id làm key
+            key={appointment._id}
           >
             <div className="flex-1 text-sm text-zinc-600">
               <p className="text-neutral-800 font-semibold">
@@ -94,17 +93,23 @@ const MyAppointments = () => {
               </p>
               <p className="text-xs mt-1">
                 <span className="text-sm text-neutral-700 font-medium">
-                  Ngày:
+                  Ngày khám:
                 </span>{" "}
                 {new Date(appointment.work_date).toLocaleDateString("vi-VN")}
               </p>
               <p className="text-xs mt-1">
                 <span className="text-sm text-neutral-700 font-medium">
-                  Ca làm việc:
+                  Ca khám:
                 </span>{" "}
                 {appointment.work_shift === "morning"
                   ? "Buổi sáng"
                   : "Buổi chiều"}
+              </p>
+              <p className="text-xs mt-1">
+                <span className="text-sm text-neutral-700 font-medium">
+                  Trạng thái:
+                </span>{" "}
+                {appointment.status === "pending" ? "Đang chờ" : "Đã xác nhận"}
               </p>
             </div>
             <div className="flex flex-col gap-2 justify-end">
@@ -113,14 +118,18 @@ const MyAppointments = () => {
               </button>
               <button
                 className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-red-600 hover:text-white transition-all duration-300"
-                onClick={() => handleCancelAppointment(appointment._id)} // Gọi hàm xóa lịch hẹn
+                onClick={() => handleCancelAppointment(appointment._id)}
               >
                 Hủy cuộc hẹn
               </button>
             </div>
           </div>
         ))}
-        {error && <p className="text-red-500">{error}</p>}
+        {error && (
+          <div className="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
+            {error}
+          </div>
+        )}
       </div>
     </div>
   );
