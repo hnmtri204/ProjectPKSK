@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-unused-vars
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
@@ -17,6 +16,7 @@ const Appointment = () => {
   const [slotTime, setSlotTime] = useState("");
   const [doctorSchedule, setDoctorSchedule] = useState({});
   const [selectedDate, setSelectedDate] = useState(null);
+  const [errorLoadingSchedule, setErrorLoadingSchedule] = useState(false); // Thêm state để theo dõi lỗi
 
   // Kiểm tra người dùng đã đăng nhập
   useEffect(() => {
@@ -40,9 +40,10 @@ const Appointment = () => {
         return acc;
       }, {});
       setDoctorSchedule(groupedSchedule);
+      setErrorLoadingSchedule(false);
     } catch (error) {
       console.error("Error fetching doctor schedule:", error);
-      toast.error("Có lỗi xảy ra khi tải lịch bác sĩ. Vui lòng thử lại.");
+      setErrorLoadingSchedule(true);
     }
   };
 
@@ -109,7 +110,7 @@ const Appointment = () => {
     try {
       const patientId = user.id;
       const token = user?.token || "";
-      const selectedSchedule = doctorSchedule[selectedDate].find(
+      const selectedSchedule = doctorSchedule[selectedDate]?.find(
         (schedule) =>
           (schedule.work_shift === "morning" && slotTime === "Buổi sáng") ||
           (schedule.work_shift === "afternoon" && slotTime === "Buổi chiều")
@@ -178,45 +179,55 @@ const Appointment = () => {
 
       {/* ----- Booking slots ----- */}
       <div className="sm:ml-72 sm:pl-4 mt-4 font-medium text-gray-700">
-        <p>Lịch làm việc của bác sĩ:</p>
-        <div className="flex gap-3 items-center w-full overflow-x-scroll mt-4">
-          {Object.keys(doctorSchedule).map((dateStr) => {
-            const date = new Date(dateStr);
-            const dayOfWeek = date.toLocaleDateString("vi-VN", { weekday: "long" });
-            return (
-              <div
-                key={dateStr}
-                className={`text-center py-6 min-w-16 rounded-full border cursor-pointer ${selectedDate === dateStr ? "bg-[#00759c] text-white" : "border-gray-200"}`}
-                onClick={() => setSelectedDate(dateStr)}
-              >
-                <p className={`text-gray-600 ${selectedDate === dateStr ? "text-white" : "text-gray-600"}`}>
-                  {dayOfWeek}
-                </p>
-                <p className={`text-gray-600 ${selectedDate === dateStr ? "text-white" : "text-gray-600"}`}>
-                  {`${date.getDate()}/${date.getMonth() + 1}`}
-                </p>
-              </div>
-            );
-          })}
-        </div>
+        <p>Đặt lịch hẹn:</p>
+        {errorLoadingSchedule ? (
+          <p className="text-red-500"></p>
+        ) : (
+          <div className="flex gap-3 items-center w-full overflow-x-scroll mt-4 py-2">
+            {Object.keys(doctorSchedule).map((dateStr) => {
+              const date = new Date(dateStr);
+              const dayOfWeek = date.toLocaleDateString("vi-VN", { weekday: "long" });
+              const isSelected = selectedDate === dateStr;
+
+              return (
+                <div
+                  key={dateStr}
+                  className={`text-center w-[100px] h-[100px] flex flex-col justify-center items-center rounded-full border cursor-pointer transition-all duration-300
+          ${isSelected ? "bg-[#00759c] text-white border-[#00759c]" : "border-gray-200 text-gray-600 hover:border-gray-300"}`}
+                  onClick={() => setSelectedDate(dateStr)}
+                >
+                  <p className={`text-sm font-medium ${isSelected ? "text-white" : "text-gray-600"}`}>
+                    {dayOfWeek}
+                  </p>
+                  <p className={`text-sm font-semibold ${isSelected ? "text-white" : "text-gray-500"}`}>
+                    {`${date.getDate()}/${date.getMonth() + 1}`}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* Hiển thị các buổi sáng và chiều theo ngày */}
-        <div className="flex items-center gap-3 w-full overflow-x-scroll mt-4">
-          {selectedDate &&
-            doctorSchedule[selectedDate].map((schedule) => (
+        {selectedDate && !errorLoadingSchedule && (
+          <div className="flex items-center gap-3 w-full overflow-x-auto mt-4">
+            {doctorSchedule[selectedDate].map((schedule) => (
               <p
                 key={schedule._id}
                 onClick={() =>
-                  setSlotTime(
-                    schedule.work_shift === "morning" ? "Buổi sáng" : "Buổi chiều"
-                  )
+                  setSlotTime(schedule.work_shift === "morning" ? "Buổi sáng" : "Buổi chiều")
                 }
-                className={`text-sm font-light flex-shrink-0 px-5 py-2 rounded-full cursor-pointer ${slotTime === (schedule.work_shift === "morning" ? "Buổi sáng" : "Buổi chiều") ? "bg-[#00759c] text-white" : "text-gray-400 border border-gray-300"}`}
+                className={`text-sm font-medium px-6 py-3 rounded-full cursor-pointer transition-all duration-300
+          ${slotTime === (schedule.work_shift === "morning" ? "Buổi sáng" : "Buổi chiều")
+                    ? "bg-[#00759c] text-white"
+                    : "text-gray-500 border border-gray-300 hover:border-[#00759c] hover:text-[#00759c]"}`}
               >
                 {schedule.work_shift === "morning" ? "Buổi sáng" : "Buổi chiều"}
               </p>
             ))}
-        </div>
+          </div>
+        )}
+
 
         <button
           onClick={handleBooking}

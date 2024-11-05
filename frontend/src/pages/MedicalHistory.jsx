@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-unused-vars
 import React, { useEffect, useState, useContext } from "react";
 import { AppContext } from "../context/AppContext";
 import axios from "axios";

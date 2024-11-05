@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-unused-vars
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -8,7 +7,7 @@ const Doctors = () => {
   const [filterDoc, setFilterDoc] = useState([]);
   const [showFilter, setShowFilter] = useState(false);
   const [specializations, setSpecializations] = useState([]);
-  const [doctors, setDoctors] = useState([]); 
+  const [doctors, setDoctors] = useState([]);
   const navigate = useNavigate();
 
   const fetchDoctors = async () => {
@@ -38,12 +37,12 @@ const Doctors = () => {
   };
 
   useEffect(() => {
-    fetchDoctors(); 
+    fetchDoctors();
     fetchSpecializations();
   }, []);
 
   useEffect(() => {
-    applyFilter(); 
+    applyFilter();
   }, [doctors, speciality]);
 
   return (
@@ -51,17 +50,17 @@ const Doctors = () => {
       <p className='text-gray-600'>Duyệt qua các bác sĩ chuyên khoa.</p>
       <div className='flex flex-col sm:flex-row items-start gap-5 mt-5'>
         <button className={`py-1 px-3 border rounded text-sm transition-all sm:hidden ${showFilter ? 'bg-primary text-white' : ''}`} onClick={() => setShowFilter(prev => !prev)}>Filters</button>
-        <div className={`flex-col gap-4 text-sm text-gray-600 ${showFilter ? 'flex' : 'hidden sm:flex'}`}>
+        <div className={`flex-col gap-4 text-[18px] text-gray-600 ${showFilter ? 'flex' : 'hidden sm:flex'}`}>
           {specializations.map(spec => (
-            <p
+            <div
               key={spec._id}
               onClick={() => speciality === spec.name ? navigate('/doctors') : navigate(`/doctors/${spec.name}`)}
-              className={`w-[94vw] sm:w-40 pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${speciality === spec.name ? "bg-indigo-100 text-black" : ""}`}>
-              {spec.name}
-            </p>
+              className={`w-[263px] h-[49px] pl-3 pr-16 border border-gray-300 rounded transition-all cursor-pointer flex items-center ${speciality === spec.name ? "bg-indigo-100 text-black" : ""}`}>
+              <p className='m-0'>{spec.name}</p>
+            </div>
           ))}
         </div>
-        <div className='w-full grid grid-cols-auto gap-4 gap-y-6'>
+        <div className='w-full grid grid-cols-4 gap-4 gap-y-6'>
           {
             filterDoc.map((item, index) => (
               <div onClick={() => navigate(`/appointment/${item._id}`)} className='border border-blue-200 rounded-xl overflow-hidden cursor-pointer hover:translate-y-[-10px] transition-all duration-500' key={index}>

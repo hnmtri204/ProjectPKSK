@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-unused-vars
 import React from 'react'
 import { assets } from '../assets/assets'
 
@@ -9,14 +8,14 @@ const Footer = () => {
                 
                 {/* ----- Left Section ----- */}
                 <div>
-                    <img className='mb-5 w-40' src={assets.logo} alt="" />
+                    <img className='mb-5 w-40' src={assets.logofood} alt="" />
                     <p className='w-full md:w-2/3 text-gray-600 leading-6'>Triple T Care cam kết hướng tới sự xuất sắc trong hoạt động thăm khám lâm sàng, đào tạo và nghiên cứu nhằm cung cấp dịch vụ chăm sóc tốt nhất. Mạng lưới chăm sóc sức khỏe của chúng tôi bao gồm hơn 2.900 giường bệnh hoạt động trên khắp 13 bệnh viện và 4 phòng khám. Trải qua 27 năm hoạt động.</p>
                 </div>
 
                 {/* ----- Center Section ----- */}
                 <div>
                     <p className='text-xl font-medium mb-5'>PHÒNG KHÁM</p>
-                    <ul className='flext flex-col gap-2 text-gray-600'>
+                    <ul className='flext flex-col gap-2 text-gray-600 leading-8'>
                         <li>Trang chủ</li>
                         <li>Về chúng tôi</li>
                         <li>Liên hệ</li>
@@ -27,9 +26,9 @@ const Footer = () => {
                 {/* ----- Right Section ----- */}
                 <div>
                     <p className='text-xl font-medium mb-5'>LIÊN HỆ</p>
-                    <ul className='flext flex-col gap-2 text-gray-600'>
+                    <ul className='flex flex-col gap-1 text-gray-600 leading-8'>
                         <li>+84-365-142-649</li>
-                        <li>lequythien1@gmail.com</li>
+                        <li>tripletcare@gmail.com</li>
                     </ul>
                 </div>
             </div>

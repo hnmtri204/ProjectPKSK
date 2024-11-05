@@ -1,8 +1,5 @@
-// eslint-disable-next-line no-unused-vars
 import React, { useEffect, useState } from 'react';
 import { assets } from '../assets/assets';
-import EyeIcon from "../assets/eye.svg"; // Nhập SVG
-import EyeOffIcon from "../assets/eye_off.svg"; // Nhập SVG
 
 const MyProfile = () => {
     const [userData, setUserData] = useState({
@@ -15,9 +12,11 @@ const MyProfile = () => {
     const [isEdit, setIsEdit] = useState(false);
     const [oldPassword, setOldPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
-    const [showPassword, setShowPassword] = useState(false); // Thêm state cho hiển thị mật khẩu
     const [errorMessage, setErrorMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
+
+    // State lưu trữ thông tin ban đầu khi bắt đầu chỉnh sửa
+    const [originalData, setOriginalData] = useState({});
 
     useEffect(() => {
         const fetchUserProfile = async () => {
@@ -46,6 +45,11 @@ const MyProfile = () => {
                 setUserData({
                     name: data.user.name,
                     image: data.user.image || assets.profile_pic,
+                    email: data.user.email,
+                    phone: data.user.phone,
+                });
+                setOriginalData({
+                    name: data.user.name,
                     email: data.user.email,
                     phone: data.user.phone,
                 });
@@ -96,6 +100,15 @@ const MyProfile = () => {
         }
     };
 
+    const handleCancel = () => {
+        // Khôi phục lại giá trị ban đầu và thoát khỏi chế độ chỉnh sửa
+        setUserData(originalData);
+        setOldPassword("");
+        setNewPassword("");
+        setErrorMessage("");
+        setIsEdit(false);
+    };
+
     return (
         <div className='flex items-center justify-center'>
             <div className='max-w-lg flex flex-col gap-2 text-sm bg-white shadow-lg rounded-lg p-6'>
@@ -134,7 +147,7 @@ const MyProfile = () => {
                             <p>{userData.email}</p>
                         )}
 
-                        <p className='font-medium'>Số điện thoại:</p>
+                        <p className='font-medium mr-4'>Số điện thoại:</p>
                         {isEdit ? (
                             <input
                                 className='bg-gray-100 max-w-52'
@@ -153,8 +166,8 @@ const MyProfile = () => {
                                         <p className='font-medium'>Mật khẩu cũ:</p>
                                         <div className='relative flex items-center'>
                                             <input
-                                                className='bg-gray-100 max-w-52 border pr-10' 
-                                                type="password"
+                                                className='bg-gray-100 max-w-52 border' 
+                                                type="text" 
                                                 value={oldPassword}
                                                 onChange={e => setOldPassword(e.target.value)}
                                                 placeholder="Nhập mật khẩu cũ"
@@ -166,17 +179,11 @@ const MyProfile = () => {
                                 <p className='font-medium'>Mật khẩu mới:</p>
                                 <div className='relative flex items-center'>
                                     <input
-                                        className='bg-gray-100 max-w-52 border pr-10' 
-                                        type={showPassword ? "text" : "password"}
+                                        className='bg-gray-100 max-w-52 border' 
+                                        type="text"
                                         value={newPassword}
                                         onChange={e => setNewPassword(e.target.value)}
                                         placeholder="Nhập mật khẩu mới"
-                                    />
-                                    <img
-                                        src={showPassword ? EyeIcon : EyeOffIcon}
-                                        alt="Chuyển đổi hiển thị mật khẩu"
-                                        className="absolute left-40 w-4 h-4 cursor-pointer" 
-                                        onClick={() => setShowPassword(!showPassword)} 
                                     />
                                 </div>
                                 <small className="text-neutral-500 italic">
@@ -195,16 +202,35 @@ const MyProfile = () => {
                     )}
                 </div>
 
-                <button
-                    onClick={() => {
-                        if (isEdit) handleSave();
-                        else setSuccessMessage('');
-                        setIsEdit(!isEdit);
-                    }}
-                    className='bg-blue-500 text-white py-2 px-4 rounded'
-                >
-                    {isEdit ? 'Lưu' : 'Chỉnh sửa'}
-                </button>
+                <div className="flex justify-center gap-4 mt-4">
+                    {isEdit ? (
+                        <>
+                            <button
+                                onClick={handleSave}
+                                className='bg-blue-500 text-white py-2 px-4 rounded'
+                            >
+                                Lưu
+                            </button>
+                            <button
+                                onClick={handleCancel}
+                                className='bg-gray-500 text-white py-2 px-4 rounded'
+                            >
+                                Hủy
+                            </button>
+                        </>
+                    ) : (
+                        <button
+                            onClick={() => {
+                                setOriginalData(userData); 
+                                setIsEdit(true);
+                                setSuccessMessage('');
+                            }}
+                            className='bg-blue-500 text-white py-2 px-4 rounded'
+                        >
+                            Chỉnh sửa
+                        </button>
+                    )}
+                </div>
             </div>
         </div>
     );

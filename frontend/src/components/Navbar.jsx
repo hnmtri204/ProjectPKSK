@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-unused-vars
 import React, { useEffect, useState } from 'react';
 import { useContext } from 'react';
 import { AppContext } from '../context/AppContext';
@@ -38,19 +37,19 @@ const Navbar = () => {
             {/* Danh sách liên kết điều hướng */}
             <ul className='hidden md:flex items-start gap-5 font-medium'>
                 <NavLink to='/'>
-                    <li className='py-1'>Trang chủ</li>
+                    <li className='py-1 text-base'>Trang chủ</li>
                     <hr className='border-none outline-none h-0.5 bg-[#00759c] w-3/5 m-auto hidden' />
                 </NavLink>
                 <NavLink to='/doctors'>
-                    <li className='py-1'>Tất cả bác sĩ</li>
+                    <li className='py-1 text-base'>Tất cả bác sĩ</li>
                     <hr className='border-none outline-none h-0.5 bg-[#00759c] w-3/5 m-auto hidden' />
                 </NavLink>
                 <NavLink to='about'>
-                    <li className='py-1'>Về chúng tôi</li>
+                    <li className='py-1 text-base'>Về chúng tôi</li>
                     <hr className='border-none outline-none h-0.5 bg-[#00759c] w-3/5 m-auto hidden' />
                 </NavLink>
                 <NavLink to='contact'>
-                    <li className='py-1'>Liên hệ</li>
+                    <li className='py-1 text-base'>Liên hệ</li>
                     <hr className='border-none outline-none h-0.5 bg-[#00759c] w-3/5 m-auto hidden' />
                 </NavLink>
             </ul>
