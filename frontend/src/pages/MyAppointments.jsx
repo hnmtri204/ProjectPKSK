@@ -35,6 +35,7 @@ const MyAppointments = () => {
           }
         } else {
           const data = await response.json();
+          console.log(data); 
           setAppointments(data);
         }
       } catch (error) {
