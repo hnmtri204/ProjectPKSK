@@ -36,7 +36,7 @@ const MyAppointments = () => {
           }
         } else {
           const data = await response.json();
-          console.log(data); 
+          console.log(data);
           setAppointments(data);
         }
       } catch (error) {
@@ -79,14 +79,14 @@ const MyAppointments = () => {
       setAppointments((prev) => prev.filter((appointment) => appointment._id !== appointmentId));
     } catch (error) {
       console.error("Error canceling appointment:", error);
-      toast.error("Bạn chỉ huỷ cuộc hẹn trước 24h."); 
+      toast.error("Bạn chỉ huỷ cuộc hẹn trước 24h.");
     }
   };
 
   return (
     <div>
       <ToastContainer />
-      <p className="pb-3 mt-12 font-medium text-zinc-700 border-b">
+      <p className="pb-3 mt-12 font-medium text-zinc-700 border-b text-xl">
         Lịch hẹn của tôi:
       </p>
       <div>
@@ -99,7 +99,7 @@ const MyAppointments = () => {
               <img className="w-32 bg-indigo-50" src={appointment.doctor_id.user_id.image} alt="Doctor" />
             </div>
             <div className="flex-1 text-sm text-zinc-600">
-              <p className="text-neutral-800 font-semibold">
+              <p className="text-lg text-neutral-800 font-semibold">
                 Bệnh nhân: {appointment.patient_id.user_id.name}
               </p>
               <p className="text-neutral-800 font-semibold">
@@ -119,11 +119,28 @@ const MyAppointments = () => {
                   ? "Buổi sáng"
                   : "Buổi chiều"}
               </p>
-              <p className="text-xs mt-1">
+              {/* <p className="text-xs mt-1">
                 <span className="text-sm text-neutral-700 font-medium">
                   Trạng thái:
                 </span>{" "}
                 {appointment.status === "pending" ? "Đang chờ" : "Đã xác nhận"}
+              </p> */}
+              <p className="text-xs mt-1">
+                <span className="text-sm text-neutral-700 font-medium">Trạng thái:</span>{" "}
+                <span
+                  className={`${appointment.status === "pending"
+                      ? "text-blue-500"
+                      : appointment.status === "confirmed"
+                        ? "text-green-500"
+                        : "text-red-500"
+                    }`}
+                >
+                  {appointment.status === "pending"
+                    ? "Đang chờ"
+                    : appointment.status === "confirmed"
+                      ? "Đã xác nhận"
+                      : "Từ chối"}
+                </span>
               </p>
             </div>
             <div className="flex flex-col gap-2 justify-end">

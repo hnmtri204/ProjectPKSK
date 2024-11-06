@@ -9,7 +9,7 @@ const About = () => {
       </div>
 
       <div className='my-10 flex flex-col md:flex-row gap-12'>
-        <img className='w-full md:max-w-[360px]' src={assets.about_image} alt="" />
+        <img className='w-full md:max-w-[360px] border-2 border-gray-300 rounded-lg' src={assets.about_image} alt="" />
         <div className='flex flex-col justify-center gap-6 md:w-2/4 text-sm text-gray-600'>
           <p>Chào mừng bạn đến với Triple T Care, đối tác đáng tin cậy của bạn trong việc quản lý nhu cầu chăm sóc sức khỏe của bạn một cách thuận tiện và hiệu quả. Tại Triple T Care, chúng tôi hiểu những thách thức mà các cá nhân gặp phải khi lên lịch hẹn với bác sĩ và quản lý hồ sơ sức khỏe của họ.</p>
           <p>Triple T Care cam kết mang đến sự xuất sắc trong công nghệ chăm sóc sức khỏe. Chúng tôi không ngừng nỗ lực nâng cao nền tảng của mình, tích hợp những tiến bộ mới nhất để cải thiện trải nghiệm người dùng và cung cấp dịch vụ vượt trội. Cho dù bạn đang đặt cuộc hẹn đầu tiên hay quản lý dịch vụ chăm sóc liên tục, Triple T Care luôn sẵn sàng hỗ trợ bạn từng bước.</p>
