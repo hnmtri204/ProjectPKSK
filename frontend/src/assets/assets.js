@@ -1,4 +1,3 @@
-import header_img from './header_img.png'
 import group_profiles from './group_profiles.png'
 import profile_pic from './upload_area.png'
 import contact_image from './kham-suc-khoe-tong-quat.png'
@@ -33,9 +32,14 @@ import doc12 from './BS-Tran-Van-Cu-1.jpg'
 import doc13 from './BS-Van-Thi-Thanh-Van-1.jpg'
 import doc14 from './BS-Vo-Van-Dinh-1-scaled.jpg'
 import doc15 from './THS.BS_.-DINH-TRAN-QUYNH-THU1-e1722841729273.png'
+import Dermatologist from './Dermatologist.svg'
+import General_physician from './General_physician.svg'
+import Gynecologist from './Gynecologist.svg'
+import Neurologist from './Neurologist.svg'
+import Pediatricians from './Pediatricians.svg'
+
 
 export const assets = {
-    header_img,
     group_profiles,
     logo,
     logofood,

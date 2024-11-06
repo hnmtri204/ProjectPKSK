@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom"; // Nhập useNavigate
 import { AppContext } from "../context/AppContext";
 import { assets } from "../assets/assets";
 import RelatedDoctors from "../components/RelatedDoctors";
@@ -10,6 +10,7 @@ import 'react-toastify/dist/ReactToastify.css';
 const Appointment = () => {
   const { docId } = useParams();
   const { doctors, user } = useContext(AppContext);
+  const navigate = useNavigate(); // Tạo hàm navigate
 
   // Khai báo state
   const [docInfo, setDocInfo] = useState(null);
@@ -47,6 +48,12 @@ const Appointment = () => {
     }
   };
 
+  // Đặt lại trạng thái đặt lịch khi một bác sĩ mới được chọn
+  useEffect(() => {
+    setSelectedDate(null);
+    setSlotTime("");
+  }, [docId, doctors]);
+
   useEffect(() => {
     if (doctors.length > 0) {
       fetchDocInfo();
@@ -64,6 +71,12 @@ const Appointment = () => {
   }, [selectedDate]);
 
   const handleBooking = async () => {
+    if (!user) {
+      // Điều hướng đến trang đăng nhập nếu người dùng chưa đăng nhập
+      navigate('/login');
+      return; // Thoát sớm khỏi hàm
+    }
+    
     if (slotTime) {
       const formattedDate = new Date(selectedDate).toLocaleDateString("vi-VN", {
         day: 'numeric',
@@ -131,6 +144,10 @@ const Appointment = () => {
           },
         });
         toast.success("Đặt lịch hẹn thành công!");
+
+        setSelectedDate(null);
+        setSlotTime("");
+
       } else {
         toast.error("Không tìm thấy lịch hẹn hoặc thông tin bệnh nhân.");
       }
@@ -208,19 +225,14 @@ const Appointment = () => {
           </div>
         )}
 
-        {/* Hiển thị các buổi sáng và chiều theo ngày */}
-        {selectedDate && !errorLoadingSchedule && (
+         {/* Hiển thị các buổi sáng và chiều theo ngày */}
+         {selectedDate && !errorLoadingSchedule && (
           <div className="flex items-center gap-3 w-full overflow-x-auto mt-4">
             {doctorSchedule[selectedDate].map((schedule) => (
-              <p
-                key={schedule._id}
-                onClick={() =>
-                  setSlotTime(schedule.work_shift === "morning" ? "Buổi sáng" : "Buổi chiều")
-                }
-                className={`text-sm font-medium px-6 py-3 rounded-full cursor-pointer transition-all duration-300
-          ${slotTime === (schedule.work_shift === "morning" ? "Buổi sáng" : "Buổi chiều")
-                    ? "bg-[#00759c] text-white"
-                    : "text-gray-500 border border-gray-300 hover:border-[#00759c] hover:text-[#00759c]"}`}
+              <p key={schedule._id} onClick={() => setSlotTime(schedule.work_shift === "morning" ? "Buổi sáng" : "Buổi chiều")}
+                className={`text-sm font-medium px-6 py-3 rounded-full cursor-pointer transition-all duration-300 ${slotTime === (schedule.work_shift === "morning" ? "Buổi sáng" : "Buổi chiều")
+                  ? "bg-[#00759c] text-white"
+                  : "text-gray-500 border border-gray-300 hover:border-[#00759c] hover:text-[#00759c]"}`}
               >
                 {schedule.work_shift === "morning" ? "Buổi sáng" : "Buổi chiều"}
               </p>
@@ -228,16 +240,17 @@ const Appointment = () => {
           </div>
         )}
 
-
-        <button
-          onClick={handleBooking}
-          className="bg-[#00759c] text-white text-sm font-light px-14 py-3 rounded-full my-6"
-        >
-          Đặt lịch hẹn
-        </button>
+        {selectedDate && slotTime && (
+          <button
+            onClick={handleBooking}
+            className="bg-[#00759c] text-white text-sm font-light px-14 py-3 rounded-full my-6"
+          >
+            Đặt lịch hẹn
+          </button>
+        )}
       </div>
 
-      {/* ----- Listing Related Doctors ----- */}
+      {/* ----- Danh sách bác sĩ liên quan ----- */}
       <RelatedDoctors docId={docId} speciality={docInfo.specialization_id.name} />
     </div>
   );

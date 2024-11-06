@@ -15,7 +15,7 @@ const Footer = () => {
                 {/* ----- Center Section ----- */}
                 <div>
                     <p className='text-xl font-medium mb-5'>PHÒNG KHÁM</p>
-                    <ul className='flext flex-col gap-2 text-gray-600 leading-8'>
+                    <ul className='flext flex-col gap-2 text-gray-600'>
                         <li>Trang chủ</li>
                         <li>Về chúng tôi</li>
                         <li>Liên hệ</li>
@@ -26,9 +26,9 @@ const Footer = () => {
                 {/* ----- Right Section ----- */}
                 <div>
                     <p className='text-xl font-medium mb-5'>LIÊN HỆ</p>
-                    <ul className='flex flex-col gap-1 text-gray-600 leading-8'>
+                    <ul className='flext flex-col gap-2 text-gray-600'>
                         <li>+84-365-142-649</li>
-                        <li>tripletcare@gmail.com</li>
+                        <li>lequythien1@gmail.com</li>
                     </ul>
                 </div>
             </div>
@@ -42,4 +42,4 @@ const Footer = () => {
     )
 }
 
-export default Footer
+export default Footer;

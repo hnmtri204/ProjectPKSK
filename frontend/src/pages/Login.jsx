@@ -139,7 +139,7 @@ const Login = () => {
           </div>
 
           <button
-            className={`bg-primary text-white w-full py-2 rounded-md text-base ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+            className={`bg-[#00759c] text-white w-full py-2 rounded-md text-base ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
             disabled={loading}
           >
             {loading ? "Đang xử lý..." : state === "Sign Up" ? "Tạo tài khoản" : "Đăng nhập"}
@@ -150,7 +150,7 @@ const Login = () => {
               Đã có tài khoản?{" "}
               <span
                 onClick={() => setState("Login")}
-                className="text-primary underline cursor-pointer"
+                className="text-[#00759c] underline cursor-pointer"
               >
                 Đăng nhập tại đây
               </span>
@@ -160,7 +160,7 @@ const Login = () => {
               Tạo một tài khoản mới?{" "}
               <span
                 onClick={() => setState("Sign Up")}
-                className="text-primary underline cursor-pointer"
+                className="text-[#00759c] underline cursor-pointer"
               >
                 bấm vào đây
               </span>
