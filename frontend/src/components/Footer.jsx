@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-unused-vars
 import React from 'react'
 import { assets } from '../assets/assets'
 
@@ -9,7 +8,7 @@ const Footer = () => {
                 
                 {/* ----- Left Section ----- */}
                 <div>
-                    <img className='mb-5 w-40' src={assets.logo} alt="" />
+                    <img className='mb-5 w-40' src={assets.logofood} alt="" />
                     <p className='w-full md:w-2/3 text-gray-600 leading-6'>Triple T Care cam kết hướng tới sự xuất sắc trong hoạt động thăm khám lâm sàng, đào tạo và nghiên cứu nhằm cung cấp dịch vụ chăm sóc tốt nhất. Mạng lưới chăm sóc sức khỏe của chúng tôi bao gồm hơn 2.900 giường bệnh hoạt động trên khắp 13 bệnh viện và 4 phòng khám. Trải qua 27 năm hoạt động.</p>
                 </div>
 
@@ -37,10 +36,10 @@ const Footer = () => {
             {/* ----- Copyright Text ----- */}
             <div>
                 <hr />
-                <p className='py-5 text-sm text-center'>Copyright 10/2024@ Prescripto - Phòng Khám Sức Khỏe.</p>
+                <p className='py-5 text-sm text-center'>Phòng Khám Sức Khỏe.</p>
             </div>
         </div>
     )
 }
 
-export default Footer
+export default Footer;

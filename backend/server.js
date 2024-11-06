@@ -20,6 +20,7 @@ const userRouterAppointment = require("./routers/Appointment");
 const userRouterSchedule = require("./routers/Schedule");
 const userRouterHome = require("./routers/Home");
 
+//middleware
 // Middleware
 const app = express();
 
@@ -48,7 +49,7 @@ app.use(session({
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: true }
+  cookie: { secure: false}
 }));
 
 // User routes

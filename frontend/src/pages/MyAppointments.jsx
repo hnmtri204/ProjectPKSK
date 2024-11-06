@@ -1,6 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const MyAppointments = () => {
   const { user } = useContext(AppContext);
@@ -34,6 +36,7 @@ const MyAppointments = () => {
           }
         } else {
           const data = await response.json();
+          console.log(data); 
           setAppointments(data);
         }
       } catch (error) {
@@ -76,12 +79,13 @@ const MyAppointments = () => {
       setAppointments((prev) => prev.filter((appointment) => appointment._id !== appointmentId));
     } catch (error) {
       console.error("Error canceling appointment:", error);
-      setError("Bạn chỉ huỷ cuộc hẹn trước 24h.");
+      toast.error("Bạn chỉ huỷ cuộc hẹn trước 24h."); 
     }
   };
 
   return (
     <div>
+      <ToastContainer />
       <p className="pb-3 mt-12 font-medium text-zinc-700 border-b">
         Lịch hẹn của tôi:
       </p>

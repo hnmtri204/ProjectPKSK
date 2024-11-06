@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-unused-vars
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
@@ -31,9 +30,9 @@ const TopDoctors = () => {
 
     return (
         <div className='flex flex-col items-center gap-4 my-16 text-gray-900 md:mx-10'>
-            <h1 className='text-3xl font-medium'>Các bác sĩ hàng đầu để đặt chỗ</h1>
-            <p className='sm:w-1/2 text-center'>Chỉ cần duyệt qua danh sách rộng lớn các bác sĩ đáng tin cậy của chúng tôi.</p>
-            <div className='w-full grid grid-cols-auto gap-4 pt-5 gap-y-6 px-3 sm:px-0'>
+            <h1 className='text-3xl font-medium'>Các Bác Sĩ Hàng Đầu Để Đặt Lịch Hẹn</h1>
+            <p className='sm:w-1/2 text-center'>Khám phá danh sách phong phú các bác sĩ uy tín của chúng tôi để dễ dàng lên lịch hẹn.</p>
+            <div className='w-full grid grid-cols-5 gap-4 pt-5 gap-y-6 px-3 sm:px-0'>
                 {doctors.slice(0, 10).map((item, index) => (
                     <div 
                         onClick={() => { navigate(`/appointment/${item._id}`); scrollTo(0, 0); }} 
